@@ -3,7 +3,6 @@ import React from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { Outlet } from "react-router-dom";
-import { ScrollRestoration } from "react-router-dom";
 
 const MainLayout: React.FC = () => {
   return (
@@ -13,7 +12,6 @@ const MainLayout: React.FC = () => {
         <Outlet />
       </main>
       <Footer />
-      <ScrollRestoration />
     </div>
   );
 };

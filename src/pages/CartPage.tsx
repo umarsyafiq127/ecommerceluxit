@@ -2,7 +2,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../contexts/CartContext";
-import { Trash2, ChevronLeft, Plus, Minus, ShoppingBag } from "lucide-react";
+import { Trash2, ChevronLeft, Plus, Minus, ShoppingBag, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 
@@ -10,10 +10,16 @@ const CartPage: React.FC = () => {
   const { cartItems, removeFromCart, updateQuantity, clearCart, totalItems, totalPrice } = useCart();
 
   const handleCheckout = () => {
-    toast({
-      title: "Checkout",
-      description: "Fitur checkout akan segera tersedia.",
-    });
+    if (cartItems.length === 0) {
+      toast({
+        title: "Keranjang Kosong",
+        description: "Silakan tambahkan produk ke keranjang Anda terlebih dahulu.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Pengguna akan diarahkan ke halaman checkout
   };
 
   if (cartItems.length === 0) {
@@ -160,13 +166,14 @@ const CartPage: React.FC = () => {
               </div>
             </div>
 
-            <Button
-              onClick={handleCheckout}
-              className="w-full bg-ahsan-merah hover:bg-ahsan-merah-tua transition-colors flex items-center justify-center gap-2"
-            >
-              <ShoppingBag size={18} />
-              <span>Lanjut ke Checkout</span>
-            </Button>
+            <Link to="/checkout">
+              <Button
+                className="w-full bg-ahsan-merah hover:bg-ahsan-merah-tua transition-colors flex items-center justify-center gap-2"
+              >
+                <ArrowRight size={18} />
+                <span>Lanjut ke Checkout</span>
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

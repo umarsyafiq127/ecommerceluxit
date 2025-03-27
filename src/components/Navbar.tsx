@@ -40,62 +40,64 @@ const Navbar: React.FC = () => {
       <div className="container mx-auto px-4 flex justify-between items-center">
         <Link 
           to="/" 
-          className="flex items-center space-x-2 text-islamic-navy"
+          className="flex items-center space-x-2 text-ahsan-merah"
           onClick={closeMenu}
         >
-          <div className="h-10 w-10 rounded-full bg-islamic-gold/20 flex items-center justify-center">
-            <span className="font-arabic text-lg font-bold text-islamic-gold">ﻷ</span>
-          </div>
-          <span className="font-serif text-xl font-semibold">Baraqah</span>
+          <img 
+            src="/lovable-uploads/6facb05b-682d-4172-81da-b35f8425046c.png" 
+            alt="Toko Ahsan Logo" 
+            className="h-12"
+          />
+          <span className="font-serif text-xl font-semibold hidden md:block">Toko Ahsan</span>
         </Link>
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-8">
           <Link
             to="/"
-            className={`text-sm font-medium transition-colors hover:text-islamic-green ${
-              isActive("/") ? "text-islamic-green" : "text-foreground"
+            className={`text-sm font-medium transition-colors hover:text-ahsan-merah ${
+              isActive("/") ? "text-ahsan-merah" : "text-foreground"
             }`}
           >
-            Home
+            Beranda
           </Link>
           <Link
             to="/products"
-            className={`text-sm font-medium transition-colors hover:text-islamic-green ${
-              isActive("/products") ? "text-islamic-green" : "text-foreground"
+            className={`text-sm font-medium transition-colors hover:text-ahsan-merah ${
+              isActive("/products") ? "text-ahsan-merah" : "text-foreground"
             }`}
           >
-            Products
+            Produk
           </Link>
           <Link
             to="/about"
-            className={`text-sm font-medium transition-colors hover:text-islamic-green ${
-              isActive("/about") ? "text-islamic-green" : "text-foreground"
+            className={`text-sm font-medium transition-colors hover:text-ahsan-merah ${
+              isActive("/about") ? "text-ahsan-merah" : "text-foreground"
             }`}
           >
-            About
+            Tentang Kami
           </Link>
           <Link
             to="/contact"
-            className={`text-sm font-medium transition-colors hover:text-islamic-green ${
-              isActive("/contact") ? "text-islamic-green" : "text-foreground"
+            className={`text-sm font-medium transition-colors hover:text-ahsan-merah ${
+              isActive("/contact") ? "text-ahsan-merah" : "text-foreground"
             }`}
           >
-            Contact
+            Kontak
           </Link>
         </div>
 
         {/* Actions */}
         <div className="hidden md:flex items-center space-x-4">
-          <Link to="/cart" className="p-2 text-foreground hover:text-islamic-green transition-colors">
+          <Link to="/cart" className="p-2 text-foreground hover:text-ahsan-merah transition-colors">
             <ShoppingCart size={20} />
           </Link>
           
           {isAuthenticated ? (
             <div className="flex items-center space-x-2">
               {isAdmin && (
-                <Link to="/admin" className="text-sm font-medium px-3 py-2 rounded-md bg-islamic-navy text-white hover:bg-islamic-navy/90 transition-colors">
-                  Admin Dashboard
+                <Link to="/admin" className="text-sm font-medium px-3 py-2 rounded-md bg-ahsan-merah-tua text-white hover:bg-ahsan-merah-tua/90 transition-colors">
+                  Dashboard Admin
                 </Link>
               )}
               <Button 
@@ -103,13 +105,13 @@ const Navbar: React.FC = () => {
                 onClick={logout}
                 className="text-sm font-medium"
               >
-                Logout
+                Keluar
               </Button>
             </div>
           ) : (
             <Link to="/login" className="flex items-center space-x-1 text-sm font-medium">
               <User size={18} />
-              <span>Login</span>
+              <span>Masuk</span>
             </Link>
           )}
         </div>
@@ -118,7 +120,7 @@ const Navbar: React.FC = () => {
         <button
           className="md:hidden p-2 text-foreground focus:outline-none"
           onClick={toggleMenu}
-          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+          aria-label={isMenuOpen ? "Tutup menu" : "Buka menu"}
         >
           {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
@@ -134,38 +136,38 @@ const Navbar: React.FC = () => {
           <Link
             to="/"
             className={`text-sm font-medium p-2 ${
-              isActive("/") ? "text-islamic-green" : "text-foreground"
+              isActive("/") ? "text-ahsan-merah" : "text-foreground"
             }`}
             onClick={closeMenu}
           >
-            Home
+            Beranda
           </Link>
           <Link
             to="/products"
             className={`text-sm font-medium p-2 ${
-              isActive("/products") ? "text-islamic-green" : "text-foreground"
+              isActive("/products") ? "text-ahsan-merah" : "text-foreground"
             }`}
             onClick={closeMenu}
           >
-            Products
+            Produk
           </Link>
           <Link
             to="/about"
             className={`text-sm font-medium p-2 ${
-              isActive("/about") ? "text-islamic-green" : "text-foreground"
+              isActive("/about") ? "text-ahsan-merah" : "text-foreground"
             }`}
             onClick={closeMenu}
           >
-            About
+            Tentang Kami
           </Link>
           <Link
             to="/contact"
             className={`text-sm font-medium p-2 ${
-              isActive("/contact") ? "text-islamic-green" : "text-foreground"
+              isActive("/contact") ? "text-ahsan-merah" : "text-foreground"
             }`}
             onClick={closeMenu}
           >
-            Contact
+            Kontak
           </Link>
           
           <div className="pt-2 border-t border-gray-200">
@@ -175,7 +177,7 @@ const Navbar: React.FC = () => {
               onClick={closeMenu}
             >
               <ShoppingCart size={18} />
-              <span className="text-sm font-medium">Cart</span>
+              <span className="text-sm font-medium">Keranjang</span>
             </Link>
             
             {isAuthenticated ? (
@@ -183,10 +185,10 @@ const Navbar: React.FC = () => {
                 {isAdmin && (
                   <Link
                     to="/admin"
-                    className="text-sm font-medium p-2 bg-islamic-navy text-white rounded-md"
+                    className="text-sm font-medium p-2 bg-ahsan-merah-tua text-white rounded-md"
                     onClick={closeMenu}
                   >
-                    Admin Dashboard
+                    Dashboard Admin
                   </Link>
                 )}
                 <Button 
@@ -197,7 +199,7 @@ const Navbar: React.FC = () => {
                   }}
                   className="text-sm font-medium justify-start p-2"
                 >
-                  Logout
+                  Keluar
                 </Button>
               </div>
             ) : (
@@ -207,7 +209,7 @@ const Navbar: React.FC = () => {
                 onClick={closeMenu}
               >
                 <User size={18} />
-                <span className="text-sm font-medium">Login</span>
+                <span className="text-sm font-medium">Masuk</span>
               </Link>
             )}
           </div>

@@ -16,7 +16,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 200 15% 15%;
 
-    --primary: 160 60% 30%;
+    --primary: 10 65% 39%;
     --primary-foreground: 40 70% 97%;
 
     --secondary: 45 76% 52%;
@@ -33,7 +33,7 @@
 
     --border: 45 76% 85%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 160 60% 30%;
+    --ring: 10 65% 39%;
 
     --radius: 0.75rem;
   }
@@ -52,7 +52,7 @@
   /* Custom Utilities */
   .islamic-pattern-bg {
     background-color: hsla(var(--background));
-    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%231F7867' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23A73121' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   }
 
   .glass {
@@ -66,15 +66,15 @@
 
 @layer components {
   .btn-primary {
-    @apply px-6 py-3 bg-islamic-green text-white rounded-md font-medium transition-all duration-300 
-           hover:bg-islamic-green/90 focus:outline-none focus:ring-2 focus:ring-islamic-green/50 
-           active:bg-islamic-green/80 shadow-md hover:shadow-lg;
+    @apply px-6 py-3 bg-ahsan-merah text-white rounded-md font-medium transition-all duration-300 
+           hover:bg-ahsan-merah/90 focus:outline-none focus:ring-2 focus:ring-ahsan-merah/50 
+           active:bg-ahsan-merah/80 shadow-md hover:shadow-lg;
   }
 
   .btn-secondary {
-    @apply px-6 py-3 bg-islamic-gold/20 text-islamic-gold border border-islamic-gold/50 rounded-md font-medium 
-           transition-all duration-300 hover:bg-islamic-gold/30 focus:outline-none focus:ring-2 
-           focus:ring-islamic-gold/30 active:bg-islamic-gold/40;
+    @apply px-6 py-3 bg-ahsan-emas/20 text-ahsan-merah border border-ahsan-emas/50 rounded-md font-medium 
+           transition-all duration-300 hover:bg-ahsan-emas/30 focus:outline-none focus:ring-2 
+           focus:ring-ahsan-emas/30 active:bg-ahsan-emas/40;
   }
 
   .card-product {
@@ -82,15 +82,15 @@
   }
 
   .heading-primary {
-    @apply font-serif text-4xl md:text-5xl lg:text-6xl font-bold text-islamic-navy leading-tight;
+    @apply font-serif text-4xl md:text-5xl lg:text-6xl font-bold text-ahsan-merah-tua leading-tight;
   }
 
   .heading-secondary {
-    @apply font-serif text-2xl md:text-3xl lg:text-4xl font-semibold text-islamic-teal;
+    @apply font-serif text-2xl md:text-3xl lg:text-4xl font-semibold text-ahsan-merah;
   }
 
   .heading-tertiary {
-    @apply font-serif text-xl md:text-2xl font-medium text-islamic-navy;
+    @apply font-serif text-xl md:text-2xl font-medium text-ahsan-merah-tua;
   }
 
   .text-balance {
@@ -104,7 +104,7 @@
   .islamic-divider::before,
   .islamic-divider::after {
     content: "";
-    @apply flex-grow h-px bg-islamic-gold/30;
+    @apply flex-grow h-px bg-ahsan-emas/30;
   }
 
   .islamic-divider::before {
@@ -133,19 +133,19 @@
   }
 
   .scroll-indicator {
-    @apply absolute bottom-6 left-1/2 -translate-x-1/2 h-14 w-8 rounded-full border-2 border-islamic-gold/30 flex justify-center p-2;
+    @apply absolute bottom-6 left-1/2 -translate-x-1/2 h-14 w-8 rounded-full border-2 border-ahsan-emas/30 flex justify-center p-2;
   }
 
   .scroll-indicator::after {
     content: "";
-    @apply w-1 h-3 bg-islamic-gold/30 rounded-full animate-bounce;
+    @apply w-1 h-3 bg-ahsan-emas/30 rounded-full animate-bounce;
   }
 
   .grid-pattern {
     background-size: 40px 40px;
     background-image: 
-      linear-gradient(to right, rgba(31, 120, 103, 0.05) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(31, 120, 103, 0.05) 1px, transparent 1px);
+      linear-gradient(to right, rgba(167, 49, 33, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(167, 49, 33, 0.05) 1px, transparent 1px);
   }
 }
 

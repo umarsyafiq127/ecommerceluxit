@@ -63,12 +63,13 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				islamic: {
-					'green': '#1F7867',
-					'gold': '#D4AF37',
-					'teal': '#084C61',
-					'cream': '#FDF8E2',
-					'navy': '#1A2238'
+				ahsan: {
+					'merah': '#A73121',
+					'merah-tua': '#8B0000',
+					'emas': '#D4AF37',
+					'emas-muda': '#F5DEB3',
+					'krem': '#FDF8E2',
+					'coklat': '#A0522D'
 				}
 			},
 			borderRadius: {
@@ -141,7 +142,7 @@ export default {
 				'pulse-gentle': 'pulse-gentle 3s infinite'
 			},
 			backgroundImage: {
-				'geometric-pattern': "url('data:image/svg+xml;utf8,<svg width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M0,10 a1,1 0 0,0 20,0\" fill=\"%23D4AF3710\"/></svg>')",
+				'geometric-pattern': "url('data:image/svg+xml;utf8,<svg width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M0,10 a1,1 0 0,0 20,0\" fill=\"%23A7312110\"/></svg>')",
 				'arabesque': "url('data:image/svg+xml;utf8,<svg width=\"40\" height=\"40\" viewBox=\"0 0 40 40\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M0,20 a1,1 0 0,0 40,0 a1,1 0 0,0 -40,0 M10,10 a1,1 0 0,0 20,20 a1,1 0 0,0 -20,-20\" fill=\"%23D4AF3705\"/></svg>')"
 			},
 			fontFamily: {

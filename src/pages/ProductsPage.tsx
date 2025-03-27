@@ -47,7 +47,7 @@ const ProductsPage: React.FC = () => {
           setPriceRange([0, roundedMaxPrice]);
         }
       } catch (err) {
-        setError("Failed to load products");
+        setError("Gagal memuat produk");
         console.error(err);
       } finally {
         setLoading(false);
@@ -87,7 +87,7 @@ const ProductsPage: React.FC = () => {
         const filtered = await getProducts(filterOptions);
         setFilteredProducts(filtered);
       } catch (err) {
-        console.error("Error applying filters:", err);
+        console.error("Error menerapkan filter:", err);
       }
     };
 
@@ -109,7 +109,7 @@ const ProductsPage: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen pt-24 flex items-start justify-center">
-        <div className="w-16 h-16 border-4 border-islamic-gold/20 border-t-islamic-gold rounded-full animate-spin"></div>
+        <div className="w-16 h-16 border-4 border-ahsan-emas/20 border-t-ahsan-emas rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -129,10 +129,9 @@ const ProductsPage: React.FC = () => {
     <div className="container mx-auto px-4 pt-24 pb-16">
       <div className="mb-8 text-center">
         <div className="animate-fade-in">
-          <h1 className="heading-primary mb-4">Our Products</h1>
+          <h1 className="heading-primary mb-4">Produk Kami</h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Discover our curated selection of premium Islamic and spiritual products,
-            crafted with care and attention to detail.
+            Temukan koleksi pilihan produk oleh-oleh haji & umroh premium kami, yang dibuat dengan perhatian dan detail.
           </p>
         </div>
       </div>
@@ -143,10 +142,10 @@ const ProductsPage: React.FC = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <Input
               type="text"
-              placeholder="Search products..."
+              placeholder="Cari produk..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border-islamic-cream focus:border-islamic-gold"
+              className="pl-10 pr-4 py-2 border-ahsan-krem focus:border-ahsan-emas"
             />
           </div>
 
@@ -156,14 +155,14 @@ const ProductsPage: React.FC = () => {
               onValueChange={(value) => setSortOption(value)}
             >
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Sort by" />
+                <SelectValue placeholder="Urutkan berdasarkan" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="createdAt-desc">Newest</SelectItem>
-                <SelectItem value="price-asc">Price: Low to High</SelectItem>
-                <SelectItem value="price-desc">Price: High to Low</SelectItem>
-                <SelectItem value="name-asc">Name: A to Z</SelectItem>
-                <SelectItem value="name-desc">Name: Z to A</SelectItem>
+                <SelectItem value="createdAt-desc">Terbaru</SelectItem>
+                <SelectItem value="price-asc">Harga: Rendah ke Tinggi</SelectItem>
+                <SelectItem value="price-desc">Harga: Tinggi ke Rendah</SelectItem>
+                <SelectItem value="name-asc">Nama: A ke Z</SelectItem>
+                <SelectItem value="name-desc">Nama: Z ke A</SelectItem>
               </SelectContent>
             </Select>
 
@@ -173,36 +172,36 @@ const ProductsPage: React.FC = () => {
               className="flex items-center space-x-2"
             >
               <SlidersHorizontal size={16} />
-              <span>Filters</span>
+              <span>Filter</span>
             </Button>
           </div>
         </div>
 
-        {/* Filters Panel */}
+        {/* Panel Filter */}
         <div
           className={`mt-4 p-6 bg-white rounded-lg shadow-md animate-fade-in transition-all duration-300 ${
             showFilters ? "block" : "hidden"
           }`}
         >
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-serif text-xl font-medium">Filters</h2>
+            <h2 className="font-serif text-xl font-medium">Filter</h2>
             <Button variant="ghost" onClick={resetFilters} className="text-sm">
-              Reset All
+              Reset Semua
             </Button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-              <Label className="mb-2 block">Category</Label>
+              <Label className="mb-2 block">Kategori</Label>
               <Select
                 value={selectedCategory}
                 onValueChange={(value) => setSelectedCategory(value)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="All Categories" />
+                  <SelectValue placeholder="Semua Kategori" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
+                  <SelectItem value="">Semua Kategori</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category} value={category}>
                       {category}
@@ -213,7 +212,7 @@ const ProductsPage: React.FC = () => {
             </div>
 
             <div>
-              <Label className="mb-2 block">Price Range (${priceRange[0]} - ${priceRange[1]})</Label>
+              <Label className="mb-2 block">Rentang Harga (Rp{Math.round(priceRange[0] * 15000)} - Rp{Math.round(priceRange[1] * 15000)})</Label>
               <Slider
                 value={[priceRange[0], priceRange[1]]}
                 min={0}
@@ -231,23 +230,23 @@ const ProductsPage: React.FC = () => {
                   checked={onlyFeatured}
                   onCheckedChange={(checked) => setOnlyFeatured(checked as boolean)}
                 />
-                <Label htmlFor="featured">Featured Products Only</Label>
+                <Label htmlFor="featured">Hanya Produk Unggulan</Label>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Active Filters */}
+        {/* Filter Aktif */}
         {(searchTerm || selectedCategory || onlyFeatured || priceRange[0] > 0 || priceRange[1] < maxPriceInStore) && (
           <div className="mt-4 flex flex-wrap gap-2 items-center">
-            <span className="text-sm font-medium text-gray-500">Active Filters:</span>
+            <span className="text-sm font-medium text-gray-500">Filter Aktif:</span>
             
             {searchTerm && (
-              <div className="inline-flex items-center px-3 py-1 bg-islamic-cream rounded-full text-sm">
-                Search: {searchTerm}
+              <div className="inline-flex items-center px-3 py-1 bg-ahsan-krem rounded-full text-sm">
+                Pencarian: {searchTerm}
                 <button
                   onClick={() => setSearchTerm("")}
-                  className="ml-2 text-gray-500 hover:text-islamic-green"
+                  className="ml-2 text-gray-500 hover:text-ahsan-merah"
                 >
                   <X size={14} />
                 </button>
@@ -255,11 +254,11 @@ const ProductsPage: React.FC = () => {
             )}
             
             {selectedCategory && (
-              <div className="inline-flex items-center px-3 py-1 bg-islamic-cream rounded-full text-sm">
-                Category: {selectedCategory}
+              <div className="inline-flex items-center px-3 py-1 bg-ahsan-krem rounded-full text-sm">
+                Kategori: {selectedCategory}
                 <button
                   onClick={() => setSelectedCategory("")}
-                  className="ml-2 text-gray-500 hover:text-islamic-green"
+                  className="ml-2 text-gray-500 hover:text-ahsan-merah"
                 >
                   <X size={14} />
                 </button>
@@ -267,11 +266,11 @@ const ProductsPage: React.FC = () => {
             )}
             
             {onlyFeatured && (
-              <div className="inline-flex items-center px-3 py-1 bg-islamic-cream rounded-full text-sm">
-                Featured Only
+              <div className="inline-flex items-center px-3 py-1 bg-ahsan-krem rounded-full text-sm">
+                Produk Unggulan
                 <button
                   onClick={() => setOnlyFeatured(false)}
-                  className="ml-2 text-gray-500 hover:text-islamic-green"
+                  className="ml-2 text-gray-500 hover:text-ahsan-merah"
                 >
                   <X size={14} />
                 </button>
@@ -279,11 +278,11 @@ const ProductsPage: React.FC = () => {
             )}
             
             {(priceRange[0] > 0 || priceRange[1] < maxPriceInStore) && (
-              <div className="inline-flex items-center px-3 py-1 bg-islamic-cream rounded-full text-sm">
-                Price: ${priceRange[0]} - ${priceRange[1]}
+              <div className="inline-flex items-center px-3 py-1 bg-ahsan-krem rounded-full text-sm">
+                Harga: Rp{Math.round(priceRange[0] * 15000)} - Rp{Math.round(priceRange[1] * 15000)}
                 <button
                   onClick={() => setPriceRange([0, maxPriceInStore])}
-                  className="ml-2 text-gray-500 hover:text-islamic-green"
+                  className="ml-2 text-gray-500 hover:text-ahsan-merah"
                 >
                   <X size={14} />
                 </button>
@@ -293,14 +292,14 @@ const ProductsPage: React.FC = () => {
         )}
       </div>
 
-      {/* Products Grid */}
+      {/* Grid Produk */}
       {filteredProducts.length === 0 ? (
         <div className="py-16 text-center">
-          <h3 className="heading-tertiary mb-4">No products found</h3>
+          <h3 className="heading-tertiary mb-4">Tidak ada produk ditemukan</h3>
           <p className="text-gray-600 mb-6">
-            Try adjusting your search or filter criteria
+            Coba sesuaikan kriteria pencarian atau filter Anda
           </p>
-          <Button onClick={resetFilters}>Reset Filters</Button>
+          <Button onClick={resetFilters}>Reset Filter</Button>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">

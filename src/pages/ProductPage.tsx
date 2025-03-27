@@ -19,7 +19,7 @@ const ProductPage: React.FC = () => {
     const fetchProduct = async () => {
       try {
         if (!id) {
-          setError("Product ID is missing");
+          setError("ID Produk tidak ditemukan");
           setLoading(false);
           return;
         }
@@ -28,10 +28,10 @@ const ProductPage: React.FC = () => {
         if (fetchedProduct) {
           setProduct(fetchedProduct);
         } else {
-          setError("Product not found");
+          setError("Produk tidak ditemukan");
         }
       } catch (err) {
-        setError("Failed to load product");
+        setError("Gagal memuat produk");
         console.error(err);
       } finally {
         setLoading(false);
@@ -56,15 +56,15 @@ const ProductPage: React.FC = () => {
   const addToCart = () => {
     // In a real app, this would connect to a cart service
     toast({
-      title: "Added to Cart",
-      description: `${quantity} x ${product?.name} added to your cart`,
+      title: "Ditambahkan ke Keranjang",
+      description: `${quantity} x ${product?.name} ditambahkan ke keranjang Anda`,
     });
   };
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-24 h-24 border-4 border-islamic-gold/20 border-t-islamic-gold rounded-full animate-spin"></div>
+        <div className="w-24 h-24 border-4 border-ahsan-emas/20 border-t-ahsan-emas rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -74,9 +74,9 @@ const ProductPage: React.FC = () => {
       <div className="container mx-auto px-4 py-24">
         <div className="max-w-xl mx-auto text-center">
           <h1 className="text-2xl font-serif mb-4">Error</h1>
-          <p className="mb-6">{error || "Product not found"}</p>
+          <p className="mb-6">{error || "Produk tidak ditemukan"}</p>
           <Link to="/products" className="btn-primary">
-            Return to Products
+            Kembali ke Produk
           </Link>
         </div>
       </div>
@@ -87,17 +87,17 @@ const ProductPage: React.FC = () => {
     <div className="container mx-auto px-4 py-24">
       <Link
         to="/products"
-        className="inline-flex items-center text-islamic-teal mb-8 hover:text-islamic-green transition-colors"
+        className="inline-flex items-center text-ahsan-merah mb-8 hover:text-ahsan-merah-tua transition-colors"
       >
         <ChevronLeft size={20} />
-        <span>Back to Products</span>
+        <span>Kembali ke Produk</span>
       </Link>
 
       <div className="grid md:grid-cols-2 gap-10">
-        {/* Product Images */}
+        {/* Gambar Produk */}
         <div className="perspective-container">
           <div className="rotate-y-hover">
-            <div className="aspect-square overflow-hidden rounded-2xl bg-islamic-cream">
+            <div className="aspect-square overflow-hidden rounded-2xl bg-ahsan-krem">
               {product.images.length > 0 ? (
                 <img
                   src={product.images[activeImage]}
@@ -105,14 +105,14 @@ const ProductPage: React.FC = () => {
                   className="w-full h-full object-cover object-center transition-all duration-700"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-islamic-cream">
-                  <span className="text-islamic-gold/40 text-2xl">No Image</span>
+                <div className="w-full h-full flex items-center justify-center bg-ahsan-krem">
+                  <span className="text-ahsan-emas/40 text-2xl">Tidak Ada Gambar</span>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Thumbnail Gallery */}
+          {/* Galeri Thumbnail */}
           {product.images.length > 1 && (
             <div className="flex mt-4 space-x-2">
               {product.images.map((img, idx) => (
@@ -121,7 +121,7 @@ const ProductPage: React.FC = () => {
                   onClick={() => setActiveImage(idx)}
                   className={`w-20 h-20 rounded-lg overflow-hidden border-2 ${
                     activeImage === idx
-                      ? "border-islamic-gold"
+                      ? "border-ahsan-emas"
                       : "border-transparent"
                   }`}
                 >
@@ -136,20 +136,20 @@ const ProductPage: React.FC = () => {
           )}
         </div>
 
-        {/* Product Details */}
+        {/* Detail Produk */}
         <div className="flex flex-col">
           <div className="mb-2">
-            <span className="px-3 py-1 text-xs font-medium bg-islamic-cream text-islamic-navy rounded-full">
+            <span className="px-3 py-1 text-xs font-medium bg-ahsan-krem text-ahsan-merah-tua rounded-full">
               {product.category}
             </span>
           </div>
           <h1 className="heading-primary mb-4">{product.name}</h1>
-          <p className="text-2xl font-semibold text-islamic-green mb-6">
-            ${product.price.toFixed(2)}
+          <p className="text-2xl font-semibold text-ahsan-merah mb-6">
+            Rp{Math.round(product.price * 15000).toLocaleString('id-ID')}
           </p>
 
           <div className="islamic-divider">
-            <span className="relative px-4 font-arabic text-islamic-gold">﷽</span>
+            <span className="relative px-4 font-arabic text-ahsan-emas">﷽</span>
           </div>
 
           <p className="mb-8 text-gray-600 leading-relaxed">
@@ -157,20 +157,20 @@ const ProductPage: React.FC = () => {
           </p>
 
           <div className="mb-6">
-            <p className="text-sm font-medium mb-2">Availability:</p>
+            <p className="text-sm font-medium mb-2">Ketersediaan:</p>
             {product.stock > 0 ? (
-              <span className="text-islamic-green">
-                In Stock ({product.stock} available)
+              <span className="text-ahsan-merah">
+                Tersedia ({product.stock} unit)
               </span>
             ) : (
-              <span className="text-red-500">Out of Stock</span>
+              <span className="text-red-500">Stok Habis</span>
             )}
           </div>
 
           {product.stock > 0 && (
             <>
               <div className="flex items-center mb-8">
-                <span className="mr-4 text-sm font-medium">Quantity:</span>
+                <span className="mr-4 text-sm font-medium">Jumlah:</span>
                 <div className="flex items-center border border-gray-300 rounded-md">
                   <button
                     onClick={decrementQuantity}
@@ -195,14 +195,14 @@ const ProductPage: React.FC = () => {
                 className="btn-primary flex items-center justify-center space-x-2 mb-6"
               >
                 <ShoppingCart size={18} />
-                <span>Add to Cart</span>
+                <span>Tambahkan ke Keranjang</span>
               </Button>
             </>
           )}
 
           <div className="mt-auto pt-6 border-t border-gray-200">
             <p className="text-sm text-gray-500">
-              Categories: <span className="text-islamic-navy">{product.category}</span>
+              Kategori: <span className="text-ahsan-merah-tua">{product.category}</span>
             </p>
           </div>
         </div>

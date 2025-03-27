@@ -1,4 +1,3 @@
-
 import { Product, ProductCreateInput, ProductFilterOptions } from "../types/Product";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -6,14 +5,14 @@ import { v4 as uuidv4 } from 'uuid';
 let mockProducts: Product[] = [
   {
     id: "1",
-    name: "Hand-crafted Prayer Rug",
+    name: "Sajadah Premium Handmade",
     price: 129.99,
-    description: "A beautifully hand-crafted prayer rug made from the finest materials. Features traditional Islamic geometric patterns with gold accents.",
+    description: "Sajadah premium buatan tangan dari bahan berkualitas tinggi. Menampilkan pola geometris Islam tradisional dengan aksen emas.",
     images: [
       "https://images.unsplash.com/photo-1584286595398-2483189ce673?auto=format&fit=crop&q=80", 
       "https://images.unsplash.com/photo-1575369428451-eda9ae50a2e6?auto=format&fit=crop&q=80"
     ],
-    category: "Prayer Essentials",
+    category: "Perlengkapan Ibadah",
     stock: 15,
     featured: true,
     createdAt: new Date("2023-01-15"),
@@ -21,14 +20,14 @@ let mockProducts: Product[] = [
   },
   {
     id: "2",
-    name: "Premium Digital Quran",
+    name: "Air Zam-zam Asli 1L",
     price: 249.99,
-    description: "Digital Quran with beautiful recitation, translations, and tafsir. High-quality audio and elegant design.",
+    description: "Air zam-zam asli dari Mekkah dalam kemasan khusus yang aman dan higienis. Telah tersertifikasi dan diuji keasliannya.",
     images: [
       "https://images.unsplash.com/photo-1609599006353-e629aaabeb38?auto=format&fit=crop&q=80",
       "https://images.unsplash.com/photo-1619373512888-6d8aa4bf60fa?auto=format&fit=crop&q=80"
     ],
-    category: "Islamic Literature",
+    category: "Air Zam-zam",
     stock: 8,
     featured: true,
     createdAt: new Date("2023-02-10"),
@@ -36,13 +35,13 @@ let mockProducts: Product[] = [
   },
   {
     id: "3",
-    name: "Traditional Attar Set",
+    name: "Paket Parfum Attar Arabian",
     price: 79.99,
-    description: "Set of 5 premium alcohol-free attars in elegant glass bottles. Includes musk, oud, amber, rose, and jasmine scents.",
+    description: "Set 5 parfum attar premium bebas alkohol dalam botol kaca elegan. Termasuk wewangian musk, oud, amber, rose, dan jasmine.",
     images: [
       "https://images.unsplash.com/photo-1623491355342-a521abb3e86f?auto=format&fit=crop&q=80"
     ],
-    category: "Personal Care",
+    category: "Parfum & Minyak Wangi",
     stock: 20,
     featured: false,
     createdAt: new Date("2023-03-05"),
@@ -50,13 +49,13 @@ let mockProducts: Product[] = [
   },
   {
     id: "4",
-    name: "Elegant Hijab - Emerald",
+    name: "Jilbab Elegant - Hijau Zamrud",
     price: 34.99,
-    description: "Premium quality hijab made from breathable fabric. Elegant emerald color with subtle pattern.",
+    description: "Jilbab premium berkualitas tinggi terbuat dari bahan yang nyaman dan adem. Warna hijau zamrud elegan dengan motif halus.",
     images: [
       "https://images.unsplash.com/photo-1607868894064-2b6e7ed1b324?auto=format&fit=crop&q=80"
     ],
-    category: "Clothing",
+    category: "Busana Muslim",
     stock: 30,
     featured: false,
     createdAt: new Date("2023-03-20"),
@@ -64,13 +63,13 @@ let mockProducts: Product[] = [
   },
   {
     id: "5",
-    name: "Islamic Calligraphy Art",
+    name: "Kurma Ajwa Premium 1kg",
     price: 199.99,
-    description: "Beautiful hand-made Islamic calligraphy art piece. Perfect for decorating your home or as a gift.",
+    description: "Kurma Ajwa asli dari Madinah berkualitas premium. Dikemas dengan hati-hati agar tetap segar dan lezat.",
     images: [
       "https://images.unsplash.com/photo-1618076516180-c15281f0c885?auto=format&fit=crop&q=80"
     ],
-    category: "Home Decor",
+    category: "Kurma & Makanan",
     stock: 5,
     featured: true,
     createdAt: new Date("2023-04-12"),

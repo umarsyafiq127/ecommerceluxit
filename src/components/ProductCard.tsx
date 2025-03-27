@@ -3,6 +3,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Product } from "../types/Product";
 import { ShoppingCart } from "lucide-react";
+import { useCart } from "../contexts/CartContext";
 import { toast } from "@/components/ui/use-toast";
 
 interface ProductCardProps {
@@ -10,20 +11,19 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const addToCart = (e: React.MouseEvent) => {
+  const { addToCart } = useCart();
+
+  const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    // In a real app, this would connect to a cart service
-    toast({
-      title: "Added to Cart",
-      description: `${product.name} added to your cart`,
-    });
+    
+    addToCart(product, 1);
   };
 
   return (
     <div className="card-product group h-full flex flex-col overflow-hidden animate-scale-up transition-all duration-300 hover:-translate-y-1">
       <Link to={`/products/${product.id}`} className="flex-1 flex flex-col">
-        <div className="aspect-square relative overflow-hidden bg-islamic-cream">
+        <div className="aspect-square relative overflow-hidden bg-ahsan-krem">
           {product.images.length > 0 ? (
             <img
               src={product.images[0]}
@@ -31,23 +31,23 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-islamic-cream">
-              <span className="text-islamic-gold/40 text-xl">No Image</span>
+            <div className="w-full h-full flex items-center justify-center bg-ahsan-krem">
+              <span className="text-ahsan-emas/40 text-xl">Tidak Ada Gambar</span>
             </div>
           )}
           
           {product.featured && (
             <div className="absolute top-3 left-3">
-              <span className="px-2 py-1 text-xs font-medium bg-islamic-gold/90 text-white rounded">
-                Featured
+              <span className="px-2 py-1 text-xs font-medium bg-ahsan-emas/90 text-white rounded">
+                Unggulan
               </span>
             </div>
           )}
           
           <button
-            onClick={addToCart}
-            className="absolute bottom-0 right-0 m-3 p-3 bg-white/90 hover:bg-islamic-green hover:text-white rounded-full shadow-md transition-colors duration-300 z-10"
-            aria-label="Add to cart"
+            onClick={handleAddToCart}
+            className="absolute bottom-0 right-0 m-3 p-3 bg-white/90 hover:bg-ahsan-merah hover:text-white rounded-full shadow-md transition-colors duration-300 z-10"
+            aria-label="Tambah ke keranjang"
           >
             <ShoppingCart size={18} />
           </button>
@@ -60,12 +60,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             </span>
           </div>
           
-          <h3 className="font-serif text-lg font-medium mb-2 group-hover:text-islamic-green transition-colors">
+          <h3 className="font-serif text-lg font-medium mb-2 group-hover:text-ahsan-merah transition-colors">
             {product.name}
           </h3>
           
-          <p className="text-islamic-navy font-semibold mt-auto">
-            ${product.price.toFixed(2)}
+          <p className="text-ahsan-merah font-semibold mt-auto">
+            Rp{Math.round(product.price * 15000).toLocaleString('id-ID')}
           </p>
         </div>
       </Link>

@@ -3,12 +3,14 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, ShoppingCart, User } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
+import { useCart } from "../contexts/CartContext";
 import { Button } from "@/components/ui/button";
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { isAuthenticated, isAdmin, logout } = useAuth();
+  const { totalItems } = useCart();
   const location = useLocation();
 
   useEffect(() => {
@@ -23,6 +25,11 @@ const Navbar: React.FC = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    // Close mobile menu when route changes
+    setIsMenuOpen(false);
+  }, [location]);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
@@ -89,8 +96,13 @@ const Navbar: React.FC = () => {
 
         {/* Actions */}
         <div className="hidden md:flex items-center space-x-4">
-          <Link to="/cart" className="p-2 text-foreground hover:text-ahsan-merah transition-colors">
+          <Link to="/cart" className="p-2 text-foreground hover:text-ahsan-merah transition-colors relative">
             <ShoppingCart size={20} />
+            {totalItems > 0 && (
+              <span className="absolute -top-1 -right-1 bg-ahsan-merah text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                {totalItems}
+              </span>
+            )}
           </Link>
           
           {isAuthenticated ? (
@@ -117,13 +129,24 @@ const Navbar: React.FC = () => {
         </div>
 
         {/* Mobile Menu Button */}
-        <button
-          className="md:hidden p-2 text-foreground focus:outline-none"
-          onClick={toggleMenu}
-          aria-label={isMenuOpen ? "Tutup menu" : "Buka menu"}
-        >
-          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        <div className="flex items-center space-x-3 md:hidden">
+          <Link to="/cart" className="p-2 text-foreground hover:text-ahsan-merah transition-colors relative">
+            <ShoppingCart size={20} />
+            {totalItems > 0 && (
+              <span className="absolute -top-1 -right-1 bg-ahsan-merah text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                {totalItems}
+              </span>
+            )}
+          </Link>
+          
+          <button
+            className="p-2 text-foreground focus:outline-none"
+            onClick={toggleMenu}
+            aria-label={isMenuOpen ? "Tutup menu" : "Buka menu"}
+          >
+            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu */}
@@ -178,6 +201,11 @@ const Navbar: React.FC = () => {
             >
               <ShoppingCart size={18} />
               <span className="text-sm font-medium">Keranjang</span>
+              {totalItems > 0 && (
+                <span className="bg-ahsan-merah text-white text-xs px-2 py-1 rounded-full">
+                  {totalItems}
+                </span>
+              )}
             </Link>
             
             {isAuthenticated ? (

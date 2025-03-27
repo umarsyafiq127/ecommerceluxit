@@ -44,7 +44,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await new Promise(resolve => setTimeout(resolve, 800));
       
       // Mock admin credentials - in real app, this would be validated on server
-      if (username === "admin" && password === "admin123") {
+      if (username === "admin" && password === "admin") {
         const adminUser = {
           id: "1",
           username: "admin",

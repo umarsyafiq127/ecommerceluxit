@@ -6,6 +6,7 @@ import { Product } from "../types/Product";
 import { ChevronLeft, Plus, Minus, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
+import { useCart } from "../contexts/CartContext";
 
 const ProductPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -14,6 +15,7 @@ const ProductPage: React.FC = () => {
   const [error, setError] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
+  const { addToCart } = useCart();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -53,12 +55,10 @@ const ProductPage: React.FC = () => {
     }
   };
 
-  const addToCart = () => {
-    // In a real app, this would connect to a cart service
-    toast({
-      title: "Ditambahkan ke Keranjang",
-      description: `${quantity} x ${product?.name} ditambahkan ke keranjang Anda`,
-    });
+  const handleAddToCart = () => {
+    if (product) {
+      addToCart(product, quantity);
+    }
   };
 
   if (loading) {
@@ -191,7 +191,7 @@ const ProductPage: React.FC = () => {
               </div>
 
               <Button
-                onClick={addToCart}
+                onClick={handleAddToCart}
                 className="btn-primary flex items-center justify-center space-x-2 mb-6"
               >
                 <ShoppingCart size={18} />

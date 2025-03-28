@@ -1,57 +1,65 @@
 
 import { RecentOrder } from "../types/Order";
+import { v4 as uuidv4 } from 'uuid';
 
 // Mock storage for recent orders
-let mockRecentOrders: RecentOrder[] = [
+let recentOrders: RecentOrder[] = [
   {
     id: "1",
     customerName: "Ahmad Rizki",
-    productNames: ["Sajadah Premium Handmade", "Kurma Ajwa Premium 1kg"],
+    productNames: ["Sajadah Premium Handmade", "Air Zam-zam Asli 1L"],
     location: "Jakarta",
-    paymentMethod: "Transfer",
-    orderDate: new Date("2023-06-10")
+    paymentMethod: "Transfer Bank",
+    orderDate: new Date("2023-05-15")
   },
   {
     id: "2",
-    customerName: "Siti Aisyah",
-    productNames: ["Air Zam-zam Asli 1L"],
-    location: "Surabaya",
+    customerName: "Siti Aminah",
+    productNames: ["Kurma Ajwa Premium 1kg"],
+    location: "Bandung",
     paymentMethod: "COD",
-    orderDate: new Date("2023-06-12")
+    orderDate: new Date("2023-05-16")
   },
   {
     id: "3",
-    customerName: "Muhammad Faisal",
-    productNames: ["Paket Parfum Attar Arabian", "Jilbab Elegant - Hijau Zamrud"],
-    location: "Bandung",
-    paymentMethod: "Transfer",
-    orderDate: new Date("2023-06-15")
+    customerName: "Budi Santoso",
+    productNames: ["Paket Parfum Attar Arabian", "Sajadah Premium Handmade"],
+    location: "Surabaya",
+    paymentMethod: "Transfer Bank",
+    orderDate: new Date("2023-05-17")
   }
 ];
 
-// Get recent orders
+// Get all recent orders
 export const getRecentOrders = async (): Promise<RecentOrder[]> => {
   // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 800));
+  await new Promise(resolve => setTimeout(resolve, 300));
   
-  // Return a copy of the orders sorted by date (newest first)
-  return [...mockRecentOrders].sort((a, b) => 
+  // Return orders sorted by date (newest first)
+  return [...recentOrders].sort((a, b) => 
     b.orderDate.getTime() - a.orderDate.getTime()
   );
 };
 
 // Add a new order
-export const addOrder = async (order: Omit<RecentOrder, "id" | "orderDate">): Promise<RecentOrder> => {
+export const addOrder = async (
+  customerName: string,
+  productNames: string[],
+  location: string,
+  paymentMethod: string
+): Promise<RecentOrder> => {
   // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  await new Promise(resolve => setTimeout(resolve, 500));
   
   const newOrder: RecentOrder = {
-    id: String(mockRecentOrders.length + 1),
-    ...order,
+    id: uuidv4(),
+    customerName,
+    productNames,
+    location,
+    paymentMethod,
     orderDate: new Date()
   };
   
-  mockRecentOrders.push(newOrder);
-  
+  recentOrders.push(newOrder);
   return newOrder;
 };

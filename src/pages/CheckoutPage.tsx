@@ -1,15 +1,20 @@
 
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { useCart } from "../contexts/CartContext";
 import { addOrder } from "../services/OrderService";
+import { ArrowLeft, ShoppingCart, CreditCard, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/use-toast";
-import { ArrowRight, CreditCard, Truck } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Card,
   CardContent,
@@ -17,12 +22,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 
 const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
-  const { cart, clearCart, calculateTotal } = useCart();
+  const { cart, calculateTotal } = useCart();
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  
   // Form state
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -30,40 +37,29 @@ const CheckoutPage: React.FC = () => {
   const [city, setCity] = useState("");
   const [postalCode, setPostalCode] = useState("");
   const [address, setAddress] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("transfer");
+  const [paymentMethod, setPaymentMethod] = useState("");
 
-  useEffect(() => {
-    // Redirect if cart is empty
-    if (cart.length === 0) {
-      navigate("/products");
-    }
-  }, [cart, navigate]);
-
-  const formatToRupiah = (price: number) => {
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-    }).format(price);
-  };
+  if (cart.length === 0) {
+    return (
+      <div className="container mx-auto px-4 pt-24 pb-16 text-center">
+        <h1 className="heading-primary mb-6">Checkout</h1>
+        <p className="text-gray-600 mb-8">Your cart is empty. Add some products before checking out.</p>
+        <Link to="/products">
+          <Button className="bg-islamic-teal hover:bg-islamic-teal/90">
+            Browse Products
+          </Button>
+        </Link>
+      </div>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (cart.length === 0) {
+    if (!name || !phone || !province || !city || !postalCode || !address || !paymentMethod) {
       toast({
-        title: "Empty Cart",
-        description: "Your cart is empty",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    // Validate form
-    if (!name || !phone || !province || !city || !postalCode || !address) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields",
+        title: "Please fill all fields",
+        description: "All fields are required to complete your order",
         variant: "destructive",
       });
       return;
@@ -72,55 +68,58 @@ const CheckoutPage: React.FC = () => {
     try {
       setIsSubmitting(true);
       
-      // Create order text for WhatsApp
-      const total = calculateTotal();
-      const cartItems = cart.map(item => `${item.product.name} (${item.quantity}x)`).join("\n- ");
+      // Create order details
+      const productNames = cart.map(item => item.product.name);
+      const location = `${city}, ${province}`;
+      
+      // Save order to recent orders
+      await addOrder(name, productNames, location, paymentMethod);
       
       // Format WhatsApp message
-      const message = encodeURIComponent(`*NEW ORDER*
+      const cartDetails = cart.map(item => 
+        `- ${item.product.name} (${item.quantity}x) - $${(item.product.price * item.quantity).toFixed(2)}`
+      ).join('\n');
       
-*Customer Info:*
+      const orderMessage = `
+*NEW ORDER*
+------------------
+*Customer Information:*
 Name: ${name}
 Phone: ${phone}
 Address: ${address}
-${city}, ${province} ${postalCode}
+City: ${city}
+Province: ${province}
+Postal Code: ${postalCode}
 
 *Order Details:*
-- ${cartItems}
+${cartDetails}
 
-*Total: ${formatToRupiah(total)}*
-*Payment Method: ${paymentMethod === "transfer" ? "Transfer" : "COD (Cash on Delivery)"}*
+*Total: $${calculateTotal().toFixed(2)}*
+*Payment Method: ${paymentMethod}*
+------------------
+`;
       
-Thank you for your order!`);
+      // Encode the message for WhatsApp
+      const encodedMessage = encodeURIComponent(orderMessage);
+      const whatsappURL = `https://wa.me/628115554155?text=${encodedMessage}`;
       
-      // Create record of recent order
-      const productNames = cart.map(item => item.product.name);
-      await addOrder({
-        customerName: name,
-        productNames,
-        location: `${city}, ${province}`,
-        paymentMethod: paymentMethod === "transfer" ? "Transfer" : "COD"
-      });
+      // Open WhatsApp in a new tab
+      window.open(whatsappURL, '_blank');
       
-      // Open WhatsApp with the message
-      window.open(`https://wa.me/628115554155?text=${message}`, "_blank");
-      
-      // Clear cart and show success message
-      clearCart();
-      
+      // Show success message
       toast({
-        title: "Order Placed!",
-        description: "Your order has been submitted. Please complete payment via WhatsApp.",
+        title: "Order Submitted",
+        description: "Your order has been submitted. Please complete the payment process on WhatsApp.",
       });
       
-      // Redirect to recent orders page
-      navigate("/recent-orders");
-      
+      // Clear cart and redirect
+      // Note: We don't clear the cart here in case they need to reference it
+      navigate("/thank-you");
     } catch (error) {
-      console.error("Error submitting order:", error);
+      console.error("Error processing checkout:", error);
       toast({
-        title: "Error",
-        description: "Failed to submit order",
+        title: "Checkout Failed",
+        description: "An error occurred while processing your order. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -130,22 +129,27 @@ Thank you for your order!`);
 
   return (
     <div className="container mx-auto px-4 pt-24 pb-16">
-      <div className="mb-8">
+      <div className="mb-6">
+        <Link
+          to="/cart"
+          className="inline-flex items-center text-islamic-teal mb-4 hover:text-islamic-green transition-colors"
+        >
+          <ArrowLeft size={20} />
+          <span>Back to Cart</span>
+        </Link>
+        
         <h1 className="heading-primary mb-4">Checkout</h1>
         <p className="text-gray-600 max-w-2xl">
-          Complete your order by providing your shipping information and payment method.
+          Please provide your shipping information and select a payment method.
         </p>
       </div>
 
-      <div className="grid md:grid-cols-12 gap-6">
-        <div className="md:col-span-8">
-          <form onSubmit={handleSubmit}>
-            <Card className="mb-6">
+      <form onSubmit={handleSubmit}>
+        <div className="grid md:grid-cols-12 gap-6">
+          <div className="md:col-span-8">
+            <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Truck className="h-5 w-5" />
-                  Shipping Information
-                </CardTitle>
+                <CardTitle>Shipping Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -155,7 +159,6 @@ Thank you for your order!`);
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Enter your full name"
-                    required
                   />
                 </div>
                 
@@ -163,11 +166,9 @@ Thank you for your order!`);
                   <Label htmlFor="phone">Phone Number</Label>
                   <Input
                     id="phone"
-                    type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="Enter your phone number"
-                    required
                   />
                 </div>
                 
@@ -179,18 +180,16 @@ Thank you for your order!`);
                       value={province}
                       onChange={(e) => setProvince(e.target.value)}
                       placeholder="Enter your province"
-                      required
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="city">City/Regency</Label>
+                    <Label htmlFor="city">City</Label>
                     <Input
                       id="city"
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
-                      placeholder="Enter your city/regency"
-                      required
+                      placeholder="Enter your city"
                     />
                   </div>
                 </div>
@@ -202,7 +201,6 @@ Thank you for your order!`);
                     value={postalCode}
                     onChange={(e) => setPostalCode(e.target.value)}
                     placeholder="Enter your postal code"
-                    required
                   />
                 </div>
                 
@@ -212,111 +210,102 @@ Thank you for your order!`);
                     id="address"
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
-                    placeholder="Enter your full address"
+                    placeholder="Enter your complete address"
                     rows={3}
-                    required
                   />
                 </div>
               </CardContent>
             </Card>
             
-            <Card>
+            <Card className="mt-6">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CreditCard className="h-5 w-5" />
-                  Payment Method
-                </CardTitle>
+                <CardTitle>Payment Method</CardTitle>
               </CardHeader>
               <CardContent>
-                <RadioGroup 
-                  value={paymentMethod} 
-                  onValueChange={setPaymentMethod}
-                  className="space-y-4"
-                >
-                  <div className="flex items-center space-x-2 border p-4 rounded-md">
-                    <RadioGroupItem value="transfer" id="transfer" />
-                    <Label htmlFor="transfer" className="flex-1 cursor-pointer">
-                      <span className="font-medium">Bank Transfer</span>
-                      <p className="text-sm text-gray-500">
-                        Pay via bank transfer. Instructions will be sent via WhatsApp.
-                      </p>
-                    </Label>
-                  </div>
+                <div className="space-y-4">
+                  <Label>Select Payment Method</Label>
+                  <Select onValueChange={setPaymentMethod} value={paymentMethod}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select payment method" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Transfer Bank">
+                        <div className="flex items-center">
+                          <CreditCard className="mr-2 h-4 w-4" />
+                          <span>Transfer Bank</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="COD">
+                        <div className="flex items-center">
+                          <DollarSign className="mr-2 h-4 w-4" />
+                          <span>Cash on Delivery (COD)</span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                   
-                  <div className="flex items-center space-x-2 border p-4 rounded-md">
-                    <RadioGroupItem value="cod" id="cod" />
-                    <Label htmlFor="cod" className="flex-1 cursor-pointer">
-                      <span className="font-medium">Cash on Delivery (COD)</span>
-                      <p className="text-sm text-gray-500">
-                        Pay when you receive the product.
-                      </p>
-                    </Label>
+                  <div className="mt-4 text-sm text-gray-500">
+                    <p>
+                      Payment details will be sent to you via WhatsApp after order confirmation.
+                    </p>
                   </div>
-                </RadioGroup>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <div className="md:col-span-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Order Summary</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {cart.map((item) => (
+                    <div key={item.product.id} className="flex justify-between">
+                      <div>
+                        <p className="font-medium">
+                          {item.product.name} x {item.quantity}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          ${item.product.price.toFixed(2)} each
+                        </p>
+                      </div>
+                      <p className="font-medium">
+                        ${(item.product.price * item.quantity).toFixed(2)}
+                      </p>
+                    </div>
+                  ))}
+                  
+                  <Separator />
+                  
+                  <div className="flex justify-between font-bold">
+                    <p>Total</p>
+                    <p>${calculateTotal().toFixed(2)}</p>
+                  </div>
+                </div>
               </CardContent>
               <CardFooter>
-                <Button 
+                <Button
                   type="submit"
-                  disabled={isSubmitting || cart.length === 0}
-                  className="w-full bg-islamic-green hover:bg-islamic-green/90 flex items-center justify-center gap-2"
+                  className="w-full bg-islamic-green hover:bg-islamic-green/90 flex items-center justify-center space-x-2"
+                  disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Processing..." : "Complete Order"}
-                  {!isSubmitting && <ArrowRight size={16} />}
+                  <ShoppingCart size={16} />
+                  <span>{isSubmitting ? "Processing..." : "Complete Order"}</span>
                 </Button>
               </CardFooter>
             </Card>
-          </form>
+            
+            <div className="mt-4 p-4 bg-islamic-cream/30 rounded-lg text-sm">
+              <p className="font-medium mb-2">Note:</p>
+              <p>
+                After clicking "Complete Order", you will be redirected to WhatsApp to confirm your order and complete the payment process.
+              </p>
+            </div>
+          </div>
         </div>
-        
-        <div className="md:col-span-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Order Summary</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {cart.length === 0 ? (
-                <p className="text-gray-500 text-center py-4">Your cart is empty</p>
-              ) : (
-                <>
-                  <div className="space-y-3">
-                    {cart.map((item) => (
-                      <div key={item.product.id} className="flex justify-between">
-                        <div>
-                          <p className="font-medium">
-                            {item.product.name} 
-                            <span className="text-gray-500 ml-1">x{item.quantity}</span>
-                          </p>
-                        </div>
-                        <p className="font-medium">
-                          {formatToRupiah(item.product.price * item.quantity)}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <div className="border-t border-b py-3 my-3">
-                    <div className="flex justify-between font-medium">
-                      <p>Total</p>
-                      <p className="text-islamic-gold">
-                        {formatToRupiah(calculateTotal())}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="text-sm text-gray-500">
-                    <p>
-                      By completing your purchase, you agree to our Terms of Service and Privacy Policy.
-                    </p>
-                    <p className="mt-2">
-                      Payment instructions will be provided via WhatsApp after order confirmation.
-                    </p>
-                  </div>
-                </>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      </form>
     </div>
   );
 };

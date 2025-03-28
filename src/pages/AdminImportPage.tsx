@@ -1,5 +1,4 @@
-
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { bulkImportProducts } from "../services/ProductService";
@@ -40,7 +39,7 @@ const AdminImportPage: React.FC = () => {
   const [importProgress, setImportProgress] = useState(0);
   const [importComplete, setImportComplete] = useState(false);
   
-  React.useEffect(() => {
+  useEffect(() => {
     // Redirect if not authenticated or not admin
     if (!isAuthenticated || !isAdmin) {
       navigate("/login");
@@ -48,7 +47,20 @@ const AdminImportPage: React.FC = () => {
   }, [isAuthenticated, isAdmin, navigate]);
 
   const handleDownloadTemplate = () => {
-    exportEmptyTemplate();
+    try {
+      exportEmptyTemplate();
+      toast({
+        title: "Template Downloaded",
+        description: "The template has been downloaded successfully",
+      });
+    } catch (error) {
+      console.error("Error downloading template:", error);
+      toast({
+        title: "Download Failed",
+        description: "Failed to download the template",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,16 +85,30 @@ const AdminImportPage: React.FC = () => {
       setProcessedData([]);
       setValidationErrors([]);
       setImportComplete(false);
+      
+      toast({
+        title: "File Selected",
+        description: `Selected file: ${selectedFile.name}`,
+      });
     }
   };
 
   const handleProcessFile = async () => {
-    if (!file) return;
+    if (!file) {
+      toast({
+        title: "No File Selected",
+        description: "Please select a file to process",
+        variant: "destructive",
+      });
+      return;
+    }
     
     setIsProcessing(true);
     
     try {
+      console.log("Processing file:", file.name);
       const products = await parseExcelToProducts(file);
+      console.log("Parsed products:", products);
       
       const validation = validateProductsData(products);
       
@@ -93,6 +119,12 @@ const AdminImportPage: React.FC = () => {
         toast({
           title: "Validation Issues",
           description: `Found ${validation.errors.length} issues in your data.`,
+          variant: "destructive",
+        });
+      } else if (products.length === 0) {
+        toast({
+          title: "No Products Found",
+          description: "No valid products found in the Excel file. Please check the template format.",
           variant: "destructive",
         });
       } else {
@@ -114,7 +146,21 @@ const AdminImportPage: React.FC = () => {
   };
 
   const handleImport = async () => {
-    if (processedData.length === 0 || validationErrors.length > 0) {
+    if (processedData.length === 0) {
+      toast({
+        title: "No Products to Import",
+        description: "There are no products to import. Please process a file first.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (validationErrors.length > 0) {
+      toast({
+        title: "Validation Errors",
+        description: "Please fix the validation errors before importing.",
+        variant: "destructive",
+      });
       return;
     }
     
@@ -130,8 +176,10 @@ const AdminImportPage: React.FC = () => {
         });
       }, 300);
       
+      console.log("Importing products:", processedData);
+      
       // Actual import
-      await bulkImportProducts(processedData);
+      const importedProducts = await bulkImportProducts(processedData);
       
       clearInterval(progressInterval);
       setImportProgress(100);
@@ -139,7 +187,7 @@ const AdminImportPage: React.FC = () => {
       
       toast({
         title: "Import Successful",
-        description: `Successfully imported ${processedData.length} products.`,
+        description: `Successfully imported ${importedProducts.length} products.`,
       });
     } catch (error) {
       console.error("Error importing products:", error);
@@ -163,6 +211,11 @@ const AdminImportPage: React.FC = () => {
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+    
+    toast({
+      title: "Reset Complete",
+      description: "You can now start a new import.",
+    });
   };
 
   return (

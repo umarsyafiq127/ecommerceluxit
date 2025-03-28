@@ -101,13 +101,16 @@ export const parseExcelToProducts = (file: File): Promise<ProductCreateInput[]> 
           };
         }).filter((product: ProductCreateInput) => product.name && product.price > 0);
         
+        console.log("Parsed products:", products);
         resolve(products);
       } catch (error) {
+        console.error("Error parsing Excel file:", error);
         reject(error);
       }
     };
     
-    reader.onerror = () => {
+    reader.onerror = (error) => {
+      console.error("FileReader error:", error);
       reject(new Error("Error reading file"));
     };
     

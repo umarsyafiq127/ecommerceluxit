@@ -19,5 +19,4 @@ export function useIsMobile() {
   return !!isMobile
 }
 
-// Adding default export
-export default useIsMobile;
+// Remove default export to fix the import error

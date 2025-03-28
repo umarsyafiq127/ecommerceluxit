@@ -1,10 +1,11 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { bulkImportProducts } from "../services/ProductService";
 import { ProductCreateInput } from "../types/Product";
 import { parseExcelToProducts, validateProductsData, exportEmptyTemplate } from "../services/ExcelService";
-import { Upload, FileText, Download, Check, AlertCircle, ArrowLeft } from "lucide-react";
+import { Upload, FileText, Download, Check, AlertCircle, ArrowLeft, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import {
@@ -293,7 +294,7 @@ const AdminImportPage: React.FC = () => {
                 </li>
               </ol>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="flex flex-col space-y-4">
               <Button 
                 onClick={handleDownloadTemplate} 
                 className="w-full flex items-center justify-center space-x-2"
@@ -301,6 +302,14 @@ const AdminImportPage: React.FC = () => {
                 <Download size={16} />
                 <span>Download Template</span>
               </Button>
+              <Link to="/admin/products/new" className="w-full">
+                <Button
+                  className="w-full bg-islamic-navy hover:bg-islamic-navy/90 flex items-center justify-center space-x-2"
+                >
+                  <Plus size={16} />
+                  <span>Add Single Product</span>
+                </Button>
+              </Link>
             </CardFooter>
           </Card>
         </div>
@@ -333,11 +342,10 @@ const AdminImportPage: React.FC = () => {
                         className="hidden"
                         id="file-upload"
                       />
-                      <label htmlFor="file-upload">
+                      <label htmlFor="file-upload" className="cursor-pointer">
                         <Button
                           type="button"
                           className="bg-islamic-green hover:bg-islamic-green/90 flex items-center space-x-2"
-                          onClick={() => fileInputRef.current?.click()}
                         >
                           <Upload size={16} />
                           <span>Select File</span>

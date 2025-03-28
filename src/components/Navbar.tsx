@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
@@ -124,7 +123,7 @@ const Navbar: React.FC = () => {
 
           {/* User Menu (Desktop) */}
           <div className="hidden md:block">
-            {isAuthenticated ? (
+            {user && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -133,10 +132,8 @@ const Navbar: React.FC = () => {
                     className="p-1 rounded-full"
                   >
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={user?.photoURL || ""} />
-                      <AvatarFallback className="bg-islamic-cream text-islamic-navy">
-                        {user?.displayName?.charAt(0) || "U"}
-                      </AvatarFallback>
+                      <AvatarImage src={user.photoURL || ''} alt={user.displayName || 'User'} />
+                      <AvatarFallback>{user.displayName ? user.displayName[0] : 'U'}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>

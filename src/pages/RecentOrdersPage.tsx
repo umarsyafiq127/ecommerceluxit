@@ -1,124 +1,120 @@
-
 import React, { useState, useEffect } from "react";
-import { ShoppingBag, CheckCircle, MapPin, Calendar } from "lucide-react";
-import { getRecentOrders } from "../services/OrderService";
-import { RecentOrder } from "../types/Order";
+import { useAuth } from "../contexts/AuthContext";
+import { getRecentOrders, EnhancedRecentOrder } from "../services/OrderService";
+import { useNavigate, Link } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/use-toast";
-import { Link } from "react-router-dom";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const RecentOrdersPage: React.FC = () => {
-  const [orders, setOrders] = useState<RecentOrder[]>([]);
+  const { isAuthenticated, isAdmin } = useAuth();
+  const navigate = useNavigate();
+  const [orders, setOrders] = useState<EnhancedRecentOrder[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchRecentOrders = async () => {
+    if (!isAuthenticated || !isAdmin) {
+      navigate("/login");
+      return;
+    }
+
+    const fetchOrders = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
         const recentOrders = await getRecentOrders();
         setOrders(recentOrders);
       } catch (error) {
-        console.error("Error fetching recent orders:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load recent orders",
-          variant: "destructive",
-        });
+        console.error("Failed to fetch recent orders:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchRecentOrders();
-  }, []);
+    fetchOrders();
+  }, [isAuthenticated, isAdmin, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen pt-24 flex items-start justify-center">
+        <div className="w-16 h-16 border-4 border-islamic-gold/20 border-t-islamic-gold rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 pt-24 pb-16">
-      <div className="text-center mb-12">
+      <div className="mb-6">
+        <Link
+          to="/admin"
+          className="inline-flex items-center text-islamic-teal mb-4 hover:text-islamic-green transition-colors"
+        >
+          <ArrowLeft size={20} />
+          <span>Back to Dashboard</span>
+        </Link>
+
         <h1 className="heading-primary mb-4">Recent Orders</h1>
-        <p className="text-gray-600 max-w-2xl mx-auto">
-          See what other customers have recently purchased from our store.
-          Join them and experience our amazing products!
+        <p className="text-gray-600 max-w-2xl">
+          A list of recent orders placed by customers.
         </p>
       </div>
 
-      {loading ? (
-        <div className="flex justify-center">
-          <div className="w-16 h-16 border-4 border-islamic-gold/20 border-t-islamic-gold rounded-full animate-spin"></div>
-        </div>
-      ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {orders.length === 0 ? (
-            <div className="col-span-full text-center py-12">
-              <ShoppingBag className="mx-auto h-16 w-16 text-gray-400" />
-              <h3 className="mt-4 text-lg font-medium">No recent orders yet</h3>
-              <p className="mt-2 text-gray-500">Be the first to place an order!</p>
-              <Button asChild className="mt-4 bg-islamic-green hover:bg-islamic-green/90">
-                <Link to="/products">Shop Now</Link>
-              </Button>
-            </div>
-          ) : (
-            orders.map((order) => (
-              <Card key={order.id} className="overflow-hidden">
-                <div className="h-2 bg-islamic-green"></div>
-                <CardHeader>
-                  <div className="flex justify-between items-center">
-                    <CardTitle className="text-lg">{order.customerName}</CardTitle>
-                    <div className="flex items-center text-xs text-gray-500">
-                      <Calendar className="h-3 w-3 mr-1" />
-                      {new Date(order.orderDate).toLocaleDateString()}
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-start space-x-3">
-                      <ShoppingBag className="h-5 w-5 text-islamic-gold mt-0.5" />
-                      <div>
-                        <p className="text-sm font-medium">Ordered:</p>
-                        <p className="text-gray-600">{order.productNames.join(", ")}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start space-x-3">
-                      <MapPin className="h-5 w-5 text-islamic-teal mt-0.5" />
-                      <div>
-                        <p className="text-sm font-medium">Location:</p>
-                        <p className="text-gray-600">{order.location}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start space-x-3">
-                      <CheckCircle className="h-5 w-5 text-islamic-green mt-0.5" />
-                      <div>
-                        <p className="text-sm font-medium">Payment Method:</p>
-                        <p className="text-gray-600">{order.paymentMethod}</p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </div>
-      )}
-      
-      <div className="mt-12 text-center">
-        <h2 className="text-2xl font-semibold mb-4">Ready to Place Your Order?</h2>
-        <p className="text-gray-600 max-w-xl mx-auto mb-6">
-          Browse our collection and find the perfect products for your needs.
-          Join our happy customers today!
-        </p>
-        <Button asChild className="bg-islamic-green hover:bg-islamic-green/90">
-          <Link to="/products">Shop Now</Link>
-        </Button>
-      </div>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Customer</TableHead>
+            <TableHead>Products</TableHead>
+            <TableHead>Date & Time</TableHead>
+            <TableHead>Location</TableHead>
+            <TableHead>Payment Method</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {orders.map((order) => {
+            // Format date and time
+            const orderDate = new Date(order.timeCreated || order.orderDate);
+            const formattedDate = orderDate.toLocaleDateString();
+            const formattedTime = orderDate.toLocaleTimeString([], { 
+              hour: '2-digit', 
+              minute: '2-digit', 
+              second: '2-digit' 
+            });
+
+            return (
+              <TableRow key={order.id}>
+                <TableCell>{order.customerName}</TableCell>
+                <TableCell>
+                  <ul className="list-disc list-inside">
+                    {order.productNames.map((product, idx) => (
+                      <li key={idx}>{product}</li>
+                    ))}
+                  </ul>
+                </TableCell>
+                <TableCell>
+                  {formattedDate}
+                  <br />
+                  <span className="text-xs text-gray-500">{formattedTime}</span>
+                </TableCell>
+                <TableCell>{order.location}</TableCell>
+                <TableCell>
+                  <span className={
+                    order.paymentMethod === "WhatsApp" 
+                      ? "text-green-600 font-medium" 
+                      : ""
+                  }>
+                    {order.paymentMethod}
+                  </span>
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
     </div>
   );
 };

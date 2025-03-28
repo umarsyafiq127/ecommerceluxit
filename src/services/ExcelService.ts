@@ -1,6 +1,7 @@
 
 import { Product, ProductCreateInput } from '../types/Product';
 import * as XLSX from 'xlsx';
+import { toast } from "@/hooks/use-toast";
 
 // Template for Excel export/import
 const EXCEL_HEADERS = [
@@ -63,6 +64,11 @@ export const exportEmptyTemplate = (): void => {
   
   // Generate file and trigger download
   XLSX.writeFile(workbook, "product_import_template.xlsx");
+  
+  toast({
+    title: "Template Downloaded",
+    description: "Product import template has been downloaded successfully"
+  });
 };
 
 // Parse Excel file into product data
@@ -73,6 +79,11 @@ export const parseExcelToProducts = (file: File): Promise<ProductCreateInput[]> 
     reader.onload = (e) => {
       try {
         if (!e.target?.result) {
+          toast({
+            title: "Error",
+            description: "Failed to read uploaded file",
+            variant: "destructive",
+          });
           throw new Error("Failed to read file");
         }
         
@@ -81,23 +92,62 @@ export const parseExcelToProducts = (file: File): Promise<ProductCreateInput[]> 
         
         // Get first sheet
         const firstSheetName = workbook.SheetNames[0];
+        if (!firstSheetName) {
+          toast({
+            title: "Error",
+            description: "The Excel file appears to be empty",
+            variant: "destructive",
+          });
+          throw new Error("Empty Excel file");
+        }
+        
         const worksheet = workbook.Sheets[firstSheetName];
         
         // Convert to JSON
         const jsonData = XLSX.utils.sheet_to_json(worksheet);
+        console.log("Raw Excel data:", jsonData);
+        
+        if (!Array.isArray(jsonData) || jsonData.length === 0) {
+          toast({
+            title: "Error",
+            description: "No data found in the Excel file",
+            variant: "destructive",
+          });
+          throw new Error("No data in Excel file");
+        }
         
         // Transform to ProductCreateInput format
         const products: ProductCreateInput[] = jsonData.map((row: any) => {
+          // Log each row for debugging
+          console.log("Processing row:", row);
+          
+          // Handle both possible column naming patterns
+          const productName = row['Product Name'] || row['name'] || '';
+          const price = typeof row['Price'] === 'number' ? row['Price'] : 
+                       typeof row['price'] === 'number' ? row['price'] : 
+                       parseFloat(row['Price'] || row['price'] || '0') || 0;
+          
+          const description = row['Description'] || row['description'] || '';
+          const category = row['Category'] || row['category'] || '';
+          
+          const stock = typeof row['Stock Quantity'] === 'number' ? row['Stock Quantity'] : 
+                       typeof row['stock'] === 'number' ? row['stock'] : 
+                       parseInt(row['Stock Quantity'] || row['stock'] || '0') || 0;
+          
+          const featuredStr = row['Featured (true/false)'] || row['featured'] || 'false';
+          const featured = featuredStr === 'true' || featuredStr === true;
+          
+          const imagesStr = row['Images (URLs separated by comma)'] || row['images'] || '';
+          const images = typeof imagesStr === 'string' ? imagesStr.split(',').map((url: string) => url.trim()) : [];
+          
           return {
-            name: row['Product Name'] || '',
-            price: typeof row['Price'] === 'number' ? row['Price'] : parseFloat(row['Price']) || 0,
-            description: row['Description'] || '',
-            category: row['Category'] || '',
-            stock: typeof row['Stock Quantity'] === 'number' ? 
-              row['Stock Quantity'] : parseInt(row['Stock Quantity']) || 0,
-            featured: row['Featured (true/false)'] === 'true' || row['Featured (true/false)'] === true,
-            images: row['Images (URLs separated by comma)'] ? 
-              row['Images (URLs separated by comma)'].split(',').map((url: string) => url.trim()) : []
+            name: productName,
+            price: price,
+            description: description,
+            category: category,
+            stock: stock,
+            featured: featured,
+            images: images
           };
         }).filter((product: ProductCreateInput) => product.name && product.price > 0);
         
@@ -111,6 +161,11 @@ export const parseExcelToProducts = (file: File): Promise<ProductCreateInput[]> 
     
     reader.onerror = (error) => {
       console.error("FileReader error:", error);
+      toast({
+        title: "Error",
+        description: "Error reading the file. Please try again.",
+        variant: "destructive",
+      });
       reject(new Error("Error reading file"));
     };
     

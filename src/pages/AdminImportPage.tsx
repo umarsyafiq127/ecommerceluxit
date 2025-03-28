@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
@@ -91,11 +90,16 @@ const AdminImportPage: React.FC = () => {
         title: "File Selected",
         description: `Selected file: ${selectedFile.name}`,
       });
+      
+      // Automatically process the file after selection
+      setTimeout(() => {
+        processFile(selectedFile);
+      }, 500);
     }
   };
 
-  const handleProcessFile = async () => {
-    if (!file) {
+  const processFile = async (fileToProcess: File) => {
+    if (!fileToProcess) {
       toast({
         title: "No File Selected",
         description: "Please select a file to process",
@@ -107,8 +111,8 @@ const AdminImportPage: React.FC = () => {
     setIsProcessing(true);
     
     try {
-      console.log("Processing file:", file.name);
-      const products = await parseExcelToProducts(file);
+      console.log("Processing file:", fileToProcess.name);
+      const products = await parseExcelToProducts(fileToProcess);
       console.log("Parsed products:", products);
       
       const validation = validateProductsData(products);
@@ -144,6 +148,19 @@ const AdminImportPage: React.FC = () => {
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const handleProcessFile = async () => {
+    if (!file) {
+      toast({
+        title: "No File Selected",
+        description: "Please select a file to process",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    await processFile(file);
   };
 
   const handleImport = async () => {

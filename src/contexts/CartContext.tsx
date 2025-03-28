@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Product } from "../types/Product";
+import { toast } from "@/hooks/use-toast";
 
 interface CartItem {
   product: Product;
@@ -53,20 +54,44 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         (item) => item.product.id === product.id
       );
 
+      let updatedCart;
+      let message;
+
       if (existingItemIndex !== -1) {
         // If item exists, update quantity
-        const updatedCart = [...prevCart];
+        updatedCart = [...prevCart];
         updatedCart[existingItemIndex].quantity += quantity;
-        return updatedCart;
+        message = `Updated quantity for ${product.name}`;
       } else {
         // Add new item
-        return [...prevCart, { product, quantity }];
+        updatedCart = [...prevCart, { product, quantity }];
+        message = `Added ${product.name} to cart`;
       }
+
+      // Show toast notification
+      toast({
+        title: "Cart Updated",
+        description: message,
+      });
+
+      return updatedCart;
     });
   };
 
   const removeFromCart = (productId: string) => {
-    setCart((prevCart) => prevCart.filter((item) => item.product.id !== productId));
+    setCart((prevCart) => {
+      const itemToRemove = prevCart.find(item => item.product.id === productId);
+      const updatedCart = prevCart.filter((item) => item.product.id !== productId);
+      
+      if (itemToRemove) {
+        toast({
+          title: "Item Removed",
+          description: `${itemToRemove.product.name} has been removed from your cart`,
+        });
+      }
+      
+      return updatedCart;
+    });
   };
 
   const updateQuantity = (productId: string, quantity: number) => {
@@ -75,15 +100,29 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
-    setCart((prevCart) =>
-      prevCart.map((item) =>
+    setCart((prevCart) => {
+      const updatedCart = prevCart.map((item) =>
         item.product.id === productId ? { ...item, quantity } : item
-      )
-    );
+      );
+      
+      const updatedItem = updatedCart.find(item => item.product.id === productId);
+      if (updatedItem) {
+        toast({
+          title: "Quantity Updated",
+          description: `${updatedItem.product.name} quantity set to ${quantity}`,
+        });
+      }
+      
+      return updatedCart;
+    });
   };
 
   const clearCart = () => {
     setCart([]);
+    toast({
+      title: "Cart Cleared",
+      description: "All items have been removed from your cart",
+    });
   };
 
   const calculateTotal = () => {

@@ -1,249 +1,297 @@
 
-import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ShoppingCart, User } from "lucide-react";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useCart } from "../contexts/CartContext";
+import {
+  Home,
+  Tag,
+  ShoppingCart,
+  Menu,
+  X,
+  Info,
+  Phone,
+  LogIn,
+  LogOut,
+  User,
+  ShoppingBag,
+  History
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "@/components/ui/use-toast";
+import useMobile from "../hooks/use-mobile";
 
 const Navbar: React.FC = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const { isAuthenticated, isAdmin, logout } = useAuth();
-  const { totalItems } = useCart();
-  const location = useLocation();
+  const { isAuthenticated, user, isAdmin, logout } = useAuth();
+  const { cart } = useCart();
+  const navigate = useNavigate();
+  const isMobile = useMobile();
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
+  const handleLogout = () => {
+    logout();
+    toast({
+      title: "Logged Out",
+      description: "You have been successfully logged out",
+    });
+    navigate("/");
+  };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
 
-  useEffect(() => {
-    // Close mobile menu when route changes
-    setIsMenuOpen(false);
-  }, [location]);
+  const closeMenu = () => {
+    setMenuOpen(false);
+  };
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const closeMenu = () => setIsMenuOpen(false);
-
-  const isActive = (path: string) => location.pathname === path;
+  const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
 
   return (
-    <nav
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-white/80 backdrop-blur-md shadow-md py-3"
-          : "bg-transparent py-5"
-      }`}
-    >
-      <div className="container mx-auto px-4 flex justify-between items-center">
-        <Link 
-          to="/" 
-          className="flex items-center space-x-2 text-ahsan-merah"
-          onClick={closeMenu}
-        >
-          <img 
-            src="/lovable-uploads/6facb05b-682d-4172-81da-b35f8425046c.png" 
-            alt="Toko Ahsan Logo" 
-            className="h-12"
-          />
-          <span className="font-serif text-xl font-semibold hidden md:block">Toko Ahsan</span>
+    <header className="fixed top-0 left-0 w-full bg-white shadow-sm z-50">
+      <nav className="container mx-auto px-4 py-3 flex items-center justify-between">
+        {/* Logo */}
+        <Link to="/" className="flex items-center">
+          <span className="font-bold text-xl text-islamic-navy">
+            BerkahStores
+          </span>
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-8">
-          <Link
-            to="/"
-            className={`text-sm font-medium transition-colors hover:text-ahsan-merah ${
-              isActive("/") ? "text-ahsan-merah" : "text-foreground"
-            }`}
-          >
-            Beranda
+        <div className="hidden md:flex items-center space-x-1">
+          <Link to="/">
+            <Button variant="ghost" size="sm" className="flex items-center">
+              <Home className="mr-1 h-4 w-4" />
+              Home
+            </Button>
           </Link>
-          <Link
-            to="/products"
-            className={`text-sm font-medium transition-colors hover:text-ahsan-merah ${
-              isActive("/products") ? "text-ahsan-merah" : "text-foreground"
-            }`}
-          >
-            Produk
+          <Link to="/products">
+            <Button variant="ghost" size="sm" className="flex items-center">
+              <Tag className="mr-1 h-4 w-4" />
+              Products
+            </Button>
           </Link>
-          <Link
-            to="/about"
-            className={`text-sm font-medium transition-colors hover:text-ahsan-merah ${
-              isActive("/about") ? "text-ahsan-merah" : "text-foreground"
-            }`}
-          >
-            Tentang Kami
+          <Link to="/recent-orders">
+            <Button variant="ghost" size="sm" className="flex items-center">
+              <History className="mr-1 h-4 w-4" />
+              Recent Orders
+            </Button>
           </Link>
-          <Link
-            to="/contact"
-            className={`text-sm font-medium transition-colors hover:text-ahsan-merah ${
-              isActive("/contact") ? "text-ahsan-merah" : "text-foreground"
-            }`}
-          >
-            Kontak
+          <Link to="/about">
+            <Button variant="ghost" size="sm" className="flex items-center">
+              <Info className="mr-1 h-4 w-4" />
+              About
+            </Button>
+          </Link>
+          <Link to="/contact">
+            <Button variant="ghost" size="sm" className="flex items-center">
+              <Phone className="mr-1 h-4 w-4" />
+              Contact
+            </Button>
           </Link>
         </div>
 
-        {/* Actions */}
-        <div className="hidden md:flex items-center space-x-4">
-          <Link to="/cart" className="p-2 text-foreground hover:text-ahsan-merah transition-colors relative">
-            <ShoppingCart size={20} />
-            {totalItems > 0 && (
-              <span className="absolute -top-1 -right-1 bg-ahsan-merah text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                {totalItems}
-              </span>
-            )}
-          </Link>
-          
-          {isAuthenticated ? (
-            <div className="flex items-center space-x-2">
-              {isAdmin && (
-                <Link to="/admin" className="text-sm font-medium px-3 py-2 rounded-md bg-ahsan-merah-tua text-white hover:bg-ahsan-merah-tua/90 transition-colors">
-                  Dashboard Admin
-                </Link>
-              )}
-              <Button 
-                variant="ghost" 
-                onClick={logout}
-                className="text-sm font-medium"
-              >
-                Keluar
-              </Button>
-            </div>
-          ) : (
-            <Link to="/login" className="flex items-center space-x-1 text-sm font-medium">
-              <User size={18} />
-              <span>Masuk</span>
-            </Link>
-          )}
-        </div>
-
-        {/* Mobile Menu Button */}
-        <div className="flex items-center space-x-3 md:hidden">
-          <Link to="/cart" className="p-2 text-foreground hover:text-ahsan-merah transition-colors relative">
-            <ShoppingCart size={20} />
-            {totalItems > 0 && (
-              <span className="absolute -top-1 -right-1 bg-ahsan-merah text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                {totalItems}
-              </span>
-            )}
-          </Link>
-          
-          <button
-            className="p-2 text-foreground focus:outline-none"
-            onClick={toggleMenu}
-            aria-label={isMenuOpen ? "Tutup menu" : "Buka menu"}
-          >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      <div
-        className={`absolute top-full left-0 w-full bg-white/95 backdrop-blur-md shadow-lg transition-all duration-300 ease-in-out md:hidden ${
-          isMenuOpen ? "max-h-[70vh] border-t overflow-y-auto" : "max-h-0 overflow-hidden border-t-0"
-        }`}
-      >
-        <div className="container mx-auto px-4 py-4 flex flex-col space-y-4">
-          <Link
-            to="/"
-            className={`text-sm font-medium p-2 ${
-              isActive("/") ? "text-ahsan-merah" : "text-foreground"
-            }`}
-            onClick={closeMenu}
-          >
-            Beranda
-          </Link>
-          <Link
-            to="/products"
-            className={`text-sm font-medium p-2 ${
-              isActive("/products") ? "text-ahsan-merah" : "text-foreground"
-            }`}
-            onClick={closeMenu}
-          >
-            Produk
-          </Link>
-          <Link
-            to="/about"
-            className={`text-sm font-medium p-2 ${
-              isActive("/about") ? "text-ahsan-merah" : "text-foreground"
-            }`}
-            onClick={closeMenu}
-          >
-            Tentang Kami
-          </Link>
-          <Link
-            to="/contact"
-            className={`text-sm font-medium p-2 ${
-              isActive("/contact") ? "text-ahsan-merah" : "text-foreground"
-            }`}
-            onClick={closeMenu}
-          >
-            Kontak
-          </Link>
-          
-          <div className="pt-2 border-t border-gray-200">
-            <Link
-              to="/cart"
-              className="flex items-center space-x-2 p-2"
-              onClick={closeMenu}
+        {/* User Actions */}
+        <div className="flex items-center space-x-3">
+          {/* Cart Button */}
+          <Link to="/cart" className="relative">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="relative p-2 rounded-full"
             >
-              <ShoppingCart size={18} />
-              <span className="text-sm font-medium">Keranjang</span>
-              {totalItems > 0 && (
-                <span className="bg-ahsan-merah text-white text-xs px-2 py-1 rounded-full">
-                  {totalItems}
-                </span>
+              <ShoppingCart className="h-5 w-5" />
+              {cartCount > 0 && (
+                <Badge
+                  className="absolute -top-1 -right-1 px-1.5 py-0.5 bg-islamic-gold text-white"
+                  variant="outline"
+                >
+                  {cartCount}
+                </Badge>
               )}
-            </Link>
-            
+            </Button>
+          </Link>
+
+          {/* User Menu (Desktop) */}
+          <div className="hidden md:block">
             {isAuthenticated ? (
-              <div className="flex flex-col space-y-2 pt-2">
-                {isAdmin && (
-                  <Link
-                    to="/admin"
-                    className="text-sm font-medium p-2 bg-ahsan-merah-tua text-white rounded-md"
-                    onClick={closeMenu}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="p-1 rounded-full"
                   >
-                    Dashboard Admin
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user?.avatar} />
+                      <AvatarFallback className="bg-islamic-cream text-islamic-navy">
+                        {user?.name?.charAt(0) || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {isAdmin && (
+                    <>
+                      <DropdownMenuItem
+                        onClick={() => navigate("/admin")}
+                        className="cursor-pointer"
+                      >
+                        <ShoppingBag className="mr-2 h-4 w-4" />
+                        <span>Admin Dashboard</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </>
+                  )}
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="cursor-pointer text-red-500"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Logout</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link to="/login">
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="bg-islamic-green hover:bg-islamic-green/90"
+                >
+                  <LogIn className="mr-1 h-4 w-4" />
+                  Login
+                </Button>
+              </Link>
+            )}
+          </div>
+
+          {/* Mobile Menu Toggle */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="p-2 md:hidden"
+            onClick={toggleMenu}
+          >
+            {menuOpen ? (
+              <X className="h-6 w-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
+          </Button>
+        </div>
+      </nav>
+
+      {/* Mobile Navigation */}
+      {isMobile && menuOpen && (
+        <div className="md:hidden bg-white border-t shadow-lg">
+          <div className="container mx-auto px-4 py-2 space-y-2">
+            <Link to="/" onClick={closeMenu}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex items-center w-full justify-start"
+              >
+                <Home className="mr-2 h-4 w-4" />
+                Home
+              </Button>
+            </Link>
+            <Link to="/products" onClick={closeMenu}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex items-center w-full justify-start"
+              >
+                <Tag className="mr-2 h-4 w-4" />
+                Products
+              </Button>
+            </Link>
+            <Link to="/recent-orders" onClick={closeMenu}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex items-center w-full justify-start"
+              >
+                <History className="mr-2 h-4 w-4" />
+                Recent Orders
+              </Button>
+            </Link>
+            <Link to="/about" onClick={closeMenu}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex items-center w-full justify-start"
+              >
+                <Info className="mr-2 h-4 w-4" />
+                About
+              </Button>
+            </Link>
+            <Link to="/contact" onClick={closeMenu}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex items-center w-full justify-start"
+              >
+                <Phone className="mr-2 h-4 w-4" />
+                Contact
+              </Button>
+            </Link>
+
+            {isAuthenticated ? (
+              <>
+                {isAdmin && (
+                  <Link to="/admin" onClick={closeMenu}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex items-center w-full justify-start"
+                    >
+                      <ShoppingBag className="mr-2 h-4 w-4" />
+                      Admin Dashboard
+                    </Button>
                   </Link>
                 )}
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="flex items-center w-full justify-start text-red-500"
                   onClick={() => {
-                    logout();
+                    handleLogout();
                     closeMenu();
                   }}
-                  className="text-sm font-medium justify-start p-2"
                 >
-                  Keluar
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
                 </Button>
-              </div>
+              </>
             ) : (
-              <Link
-                to="/login"
-                className="flex items-center space-x-2 p-2"
-                onClick={closeMenu}
-              >
-                <User size={18} />
-                <span className="text-sm font-medium">Masuk</span>
+              <Link to="/login" onClick={closeMenu}>
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="flex items-center w-full justify-start bg-islamic-green hover:bg-islamic-green/90"
+                >
+                  <LogIn className="mr-2 h-4 w-4" />
+                  Login
+                </Button>
               </Link>
             )}
           </div>
         </div>
-      </div>
-    </nav>
+      )}
+    </header>
   );
 };
 

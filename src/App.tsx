@@ -22,6 +22,9 @@ import ContactPage from "./pages/ContactPage";
 import LoginPage from "./pages/LoginPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminImportPage from "./pages/AdminImportPage";
+import AdminProductEditPage from "./pages/AdminProductEditPage";
+import AdminProductNewPage from "./pages/AdminProductNewPage";
+import RecentOrdersPage from "./pages/RecentOrdersPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,8 +41,11 @@ const router = createBrowserRouter(
       <Route path="about" element={<AboutPage />} />
       <Route path="contact" element={<ContactPage />} />
       <Route path="login" element={<LoginPage />} />
+      <Route path="recent-orders" element={<RecentOrdersPage />} />
       <Route path="admin" element={<AdminDashboard />} />
       <Route path="admin/import" element={<AdminImportPage />} />
+      <Route path="admin/products/new" element={<AdminProductNewPage />} />
+      <Route path="admin/products/:id/edit" element={<AdminProductEditPage />} />
       <Route path="*" element={<NotFound />} />
     </Route>
   )

@@ -1,40 +1,30 @@
 
 import React from "react";
-import { Link } from "react-router-dom";
 import { useCart } from "../contexts/CartContext";
-import { Trash2, ChevronLeft, Plus, Minus, ShoppingBag, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ShoppingBag, Trash2, Plus, Minus, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/use-toast";
+import { Separator } from "@/components/ui/separator";
 
 const CartPage: React.FC = () => {
-  const { cartItems, removeFromCart, updateQuantity, clearCart, totalItems, totalPrice } = useCart();
+  const { cart, removeFromCart, updateQuantity, calculateTotal } = useCart();
+  
+  const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+  const totalPrice = calculateTotal();
 
-  const handleCheckout = () => {
-    if (cartItems.length === 0) {
-      toast({
-        title: "Keranjang Kosong",
-        description: "Silakan tambahkan produk ke keranjang Anda terlebih dahulu.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    // Pengguna akan diarahkan ke halaman checkout
-  };
-
-  if (cartItems.length === 0) {
+  if (cart.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-24">
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="mb-6">
-            <ShoppingBag size={64} className="mx-auto text-gray-300" />
-          </div>
-          <h1 className="heading-secondary mb-4">Keranjang Anda Kosong</h1>
-          <p className="mb-8 text-gray-600">
-            Silakan tambahkan produk ke keranjang Anda untuk melanjutkan belanja.
+      <div className="container mx-auto px-4 pt-24 pb-16">
+        <div className="max-w-3xl mx-auto text-center py-16">
+          <ShoppingBag className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+          <h1 className="heading-primary mb-4">Your Cart is Empty</h1>
+          <p className="text-gray-600 mb-8">
+            Looks like you haven't added any products to your cart yet.
           </p>
-          <Link to="/products" className="btn-primary">
-            Lanjut Belanja
+          <Link to="/products">
+            <Button className="bg-islamic-green hover:bg-islamic-green/90">
+              Continue Shopping
+            </Button>
           </Link>
         </div>
       </div>
@@ -42,136 +32,112 @@ const CartPage: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-24">
-      <Link
-        to="/products"
-        className="inline-flex items-center text-ahsan-merah mb-8 hover:text-ahsan-merah-tua transition-colors"
-      >
-        <ChevronLeft size={20} />
-        <span>Kembali Belanja</span>
-      </Link>
+    <div className="container mx-auto px-4 pt-24 pb-16">
+      <div className="mb-8">
+        <h1 className="heading-primary mb-2">Your Shopping Cart</h1>
+        <p className="text-gray-600">
+          Review your items and proceed to checkout when ready.
+        </p>
+      </div>
 
-      <h1 className="heading-primary mb-8">Keranjang Belanja</h1>
+      <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex-grow">
+          {cart.map((item) => (
+            <div
+              key={item.product.id}
+              className="flex flex-col sm:flex-row items-start sm:items-center gap-4 py-6 border-b"
+            >
+              <div className="w-24 h-24 bg-islamic-cream rounded overflow-hidden flex-shrink-0">
+                {item.product.images && item.product.images.length > 0 ? (
+                  <img
+                    src={item.product.images[0]}
+                    alt={item.product.name}
+                    className="w-full h-full object-cover object-center"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-islamic-cream text-islamic-gold">
+                    No Image
+                  </div>
+                )}
+              </div>
 
-      <div className="grid md:grid-cols-3 gap-8">
-        <div className="md:col-span-2">
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="font-serif text-xl font-medium">
-                Produk ({totalItems})
-              </h2>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={clearCart}
-                className="text-red-500"
-              >
-                <Trash2 size={16} className="mr-2" />
-                Kosongkan
-              </Button>
-            </div>
+              <div className="flex-grow">
+                <h3 className="font-medium text-lg">{item.product.name}</h3>
+                <p className="text-islamic-gold font-medium">
+                  ${item.product.price.toFixed(2)}
+                </p>
+                {item.product.category && (
+                  <p className="text-sm text-gray-500">
+                    Category: {item.product.category}
+                  </p>
+                )}
+              </div>
 
-            <div className="divide-y">
-              {cartItems.map((item) => (
-                <div
-                  key={item.product.id}
-                  className="py-6 flex flex-col sm:flex-row gap-4"
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                  disabled={item.quantity <= 1}
                 >
-                  <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                    <img
-                      src={item.product.images[0] || "/placeholder.svg"}
-                      alt={item.product.name}
-                      className="w-full h-full object-cover object-center"
-                    />
-                  </div>
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <span className="w-8 text-center">{item.quantity}</span>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
 
-                  <div className="flex-grow">
-                    <Link
-                      to={`/products/${item.product.id}`}
-                      className="font-medium text-lg hover:text-ahsan-merah transition-colors"
-                    >
-                      {item.product.name}
-                    </Link>
-                    <p className="text-sm text-gray-500 mb-2">
-                      {item.product.category}
-                    </p>
-                    <div className="flex justify-between items-center mt-2">
-                      <div className="flex items-center border border-gray-200 rounded-md">
-                        <button
-                          onClick={() =>
-                            updateQuantity(
-                              item.product.id,
-                              Math.max(1, item.quantity - 1)
-                            )
-                          }
-                          className="px-2 py-1 text-gray-600"
-                        >
-                          <Minus size={16} />
-                        </button>
-                        <span className="px-4 py-1">{item.quantity}</span>
-                        <button
-                          onClick={() =>
-                            updateQuantity(
-                              item.product.id,
-                              Math.min(item.product.stock, item.quantity + 1)
-                            )
-                          }
-                          className="px-2 py-1 text-gray-600"
-                          disabled={item.quantity >= item.product.stock}
-                        >
-                          <Plus size={16} />
-                        </button>
-                      </div>
-                      <button
-                        onClick={() => removeFromCart(item.product.id)}
-                        className="text-red-500 hover:text-red-600"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="text-right font-medium text-lg">
-                    Rp{Math.round(item.product.price * item.quantity * 15000).toLocaleString("id-ID")}
-                  </div>
-                </div>
-              ))}
+              <div className="text-right">
+                <p className="font-medium">
+                  ${(item.product.price * item.quantity).toFixed(2)}
+                </p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="mt-2 text-red-500 hover:text-red-700 p-0 h-auto"
+                  onClick={() => removeFromCart(item.product.id)}
+                >
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  <span>Remove</span>
+                </Button>
+              </div>
             </div>
-          </div>
+          ))}
         </div>
 
-        <div className="md:col-span-1">
-          <div className="bg-white rounded-xl shadow-md p-6 sticky top-24">
-            <h2 className="font-serif text-xl font-medium mb-6">Ringkasan Belanja</h2>
-
-            <div className="space-y-4 mb-6">
+        <div className="lg:w-80 flex-shrink-0">
+          <div className="bg-gray-50 rounded-xl p-6 sticky top-24">
+            <h3 className="font-bold text-lg mb-4">Order Summary</h3>
+            
+            <div className="space-y-3 mb-4">
               <div className="flex justify-between">
-                <span className="text-gray-600">Subtotal</span>
-                <span className="font-medium">
-                  Rp{Math.round(totalPrice * 15000).toLocaleString("id-ID")}
-                </span>
+                <span className="text-gray-600">Subtotal ({totalItems} items)</span>
+                <span>${totalPrice.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Pengiriman</span>
-                <span className="text-gray-600">Dihitung pada checkout</span>
+                <span className="text-gray-600">Shipping</span>
+                <span>Calculated at checkout</span>
               </div>
             </div>
-
-            <div className="border-t pt-4 mb-6">
-              <div className="flex justify-between text-lg font-semibold">
-                <span>Total</span>
-                <span className="text-ahsan-merah">
-                  Rp{Math.round(totalPrice * 15000).toLocaleString("id-ID")}
-                </span>
-              </div>
+            
+            <Separator className="my-4" />
+            
+            <div className="flex justify-between font-bold mb-6">
+              <span>Total</span>
+              <span className="text-islamic-gold">${totalPrice.toFixed(2)}</span>
             </div>
-
+            
             <Link to="/checkout">
-              <Button
-                className="w-full bg-ahsan-merah hover:bg-ahsan-merah-tua transition-colors flex items-center justify-center gap-2"
-              >
-                <ArrowRight size={18} />
-                <span>Lanjut ke Checkout</span>
+              <Button className="w-full bg-islamic-green hover:bg-islamic-green/90 flex items-center justify-center gap-2">
+                <span>Proceed to Checkout</span>
+                <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
           </div>

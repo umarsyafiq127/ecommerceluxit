@@ -29,13 +29,13 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/components/ui/use-toast";
-import useMobile from "../hooks/use-mobile";
+import { useIsMobile } from "../hooks/use-mobile";
 
 const Navbar: React.FC = () => {
   const { isAuthenticated, user, isAdmin, logout } = useAuth();
   const { cart } = useCart();
   const navigate = useNavigate();
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = () => {
@@ -133,9 +133,9 @@ const Navbar: React.FC = () => {
                     className="p-1 rounded-full"
                   >
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={user?.avatar} />
+                      <AvatarImage src={user?.photoURL || ""} />
                       <AvatarFallback className="bg-islamic-cream text-islamic-navy">
-                        {user?.name?.charAt(0) || "U"}
+                        {user?.displayName?.charAt(0) || "U"}
                       </AvatarFallback>
                     </Avatar>
                   </Button>

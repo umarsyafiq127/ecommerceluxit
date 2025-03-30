@@ -1,13 +1,12 @@
-
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useCart } from "../contexts/CartContext";
-import { addOrder } from "../services/OrderService";
+import { addOrder, addWhatsAppOrder } from "../services/OrderService";
 import { ArrowLeft, ShoppingCart, CreditCard, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import {
   Select,
   SelectContent,
@@ -27,7 +26,7 @@ import { Separator } from "@/components/ui/separator";
 
 const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
-  const { cart, calculateTotal } = useCart();
+  const { cart, calculateTotal, clearCart } = useCart();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Form state
@@ -72,8 +71,12 @@ const CheckoutPage: React.FC = () => {
       const productNames = cart.map(item => item.product.name);
       const location = `${city}, ${province}`;
       
-      // Save order to recent orders
-      await addOrder(name, productNames, location, paymentMethod);
+      // Save order to recent orders based on payment method
+      if (paymentMethod === "WhatsApp") {
+        await addWhatsAppOrder(name, productNames, location);
+      } else {
+        await addOrder(name, productNames, location, paymentMethod);
+      }
       
       // Format WhatsApp message
       const cartDetails = cart.map(item => 
@@ -113,7 +116,7 @@ ${cartDetails}
       });
       
       // Clear cart and redirect
-      // Note: We don't clear the cart here in case they need to reference it
+      clearCart();
       navigate("/thank-you");
     } catch (error) {
       console.error("Error processing checkout:", error);

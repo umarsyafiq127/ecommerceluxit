@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
@@ -6,7 +7,7 @@ import { ProductCreateInput } from "../types/Product";
 import { parseExcelToProducts, validateProductsData, exportEmptyTemplate } from "../services/ExcelService";
 import { Upload, FileText, Download, Check, AlertCircle, ArrowLeft, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import {
   Table,
   TableBody,
@@ -359,10 +360,11 @@ const AdminImportPage: React.FC = () => {
                         className="hidden"
                         id="file-upload"
                       />
-                      <label htmlFor="file-upload" className="cursor-pointer">
+                      <label htmlFor="file-upload">
                         <Button
                           type="button"
-                          className="bg-islamic-green hover:bg-islamic-green/90 flex items-center space-x-2"
+                          className="bg-islamic-green hover:bg-islamic-green/90 flex items-center space-x-2 cursor-pointer"
+                          onClick={() => fileInputRef.current?.click()}
                         >
                           <Upload size={16} />
                           <span>Select File</span>

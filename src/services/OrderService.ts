@@ -8,7 +8,7 @@ export interface EnhancedRecentOrder extends RecentOrder {
   timeCreated: string; // Timestamp in ISO format for displaying time
 }
 
-// Mock storage for recent orders
+// Mock storage for recent orders - we'll use localStorage to persist data
 let recentOrders: EnhancedRecentOrder[] = [
   {
     id: "1",
@@ -39,10 +39,43 @@ let recentOrders: EnhancedRecentOrder[] = [
   }
 ];
 
+// Load orders from localStorage if available
+const loadOrdersFromStorage = (): void => {
+  try {
+    const savedOrders = localStorage.getItem('recentOrders');
+    if (savedOrders) {
+      recentOrders = JSON.parse(savedOrders, (key, value) => {
+        // Convert date strings back to Date objects for orderDate
+        if (key === 'orderDate') {
+          return new Date(value);
+        }
+        return value;
+      });
+    }
+  } catch (error) {
+    console.error("Failed to load orders from localStorage:", error);
+  }
+};
+
+// Save orders to localStorage
+const saveOrdersToStorage = (): void => {
+  try {
+    localStorage.setItem('recentOrders', JSON.stringify(recentOrders));
+  } catch (error) {
+    console.error("Failed to save orders to localStorage:", error);
+  }
+};
+
+// Initialize by loading from storage
+loadOrdersFromStorage();
+
 // Get all recent orders
 export const getRecentOrders = async (): Promise<EnhancedRecentOrder[]> => {
   // Simulate API delay
   await new Promise(resolve => setTimeout(resolve, 300));
+  
+  // Load from storage before returning in case it was updated elsewhere
+  loadOrdersFromStorage();
   
   // Return orders sorted by date (newest first)
   return [...recentOrders].sort((a, b) => 
@@ -73,6 +106,7 @@ export const addOrder = async (
   };
   
   recentOrders.push(newOrder);
+  saveOrdersToStorage(); // Persist to localStorage
   
   toast({
     title: "Order Added",
@@ -104,6 +138,7 @@ export const addWhatsAppOrder = async (
   };
   
   recentOrders.push(newOrder);
+  saveOrdersToStorage(); // Persist to localStorage
   
   toast({
     title: "WhatsApp Order Sent",

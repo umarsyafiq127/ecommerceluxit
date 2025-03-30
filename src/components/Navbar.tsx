@@ -124,7 +124,7 @@ const Navbar: React.FC = () => {
 
           {/* User Menu (Desktop) */}
           <div className="hidden md:block">
-            {user && (
+            {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button

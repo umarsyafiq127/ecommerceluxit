@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { getProducts, getProductCategories } from "../services/ProductService";
 import { Product, ProductFilterOptions } from "../types/Product";
@@ -186,8 +187,8 @@ const ProductsPage: React.FC = () => {
             <div>
               <Label className="mb-2 block">Kategori</Label>
               <Select
-                value={selectedCategory}
-                onValueChange={(value) => setSelectedCategory(value)}
+                value={selectedCategory || "all"}
+                onValueChange={(value) => setSelectedCategory(value === "all" ? "" : value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Semua Kategori" />

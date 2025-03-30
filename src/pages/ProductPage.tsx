@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getProductById } from "../services/ProductService";
 import { Product } from "../types/Product";
 import { ChevronLeft, Plus, Minus, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { useCart } from "../contexts/CartContext";
 
 const ProductPage: React.FC = () => {
@@ -19,6 +20,9 @@ const ProductPage: React.FC = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
+        setLoading(true);
+        setError("");
+        
         if (!id) {
           setError("ID Produk tidak ditemukan");
           setLoading(false);
@@ -32,8 +36,8 @@ const ProductPage: React.FC = () => {
           setError("Produk tidak ditemukan");
         }
       } catch (err) {
+        console.error("Error fetching product:", err);
         setError("Gagal memuat produk");
-        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -55,11 +59,20 @@ const ProductPage: React.FC = () => {
   };
 
   const handleAddToCart = () => {
-    if (product) {
+    if (!product) return;
+    
+    try {
       addToCart(product, quantity);
       toast({
         title: "Added to Cart",
         description: `${quantity} x ${product.name} added to your cart`,
+      });
+    } catch (error) {
+      console.error("Error adding product to cart:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add product to cart",
+        variant: "destructive",
       });
     }
   };
@@ -67,22 +80,39 @@ const ProductPage: React.FC = () => {
   const handleWhatsAppOrder = () => {
     if (!product) return;
     
-    import("../services/OrderService").then(({ addWhatsAppOrder }) => {
-      addWhatsAppOrder(
-        "Customer", // In a real app, this would be the logged-in user's name
-        [product.name],
-        "Customer Location" // In a real app, this would be the user's location
-      );
-    });
-    
-    const message = encodeURIComponent(
-      `Hello, I would like to order:\n\n` +
-      `${quantity}x ${product.name}\n` +
-      `Price: $${(product.price * quantity).toFixed(2)}\n\n` +
-      `Please provide details for payment and delivery.`
-    );
-    
-    window.open(`https://wa.me/+6281234567890?text=${message}`, '_blank');
+    try {
+      import("../services/OrderService").then(({ addWhatsAppOrder }) => {
+        const customerName = "Customer"; // In a real app, this would be the logged-in user's name
+        const productNames = [product.name];
+        const customerLocation = "Customer Location"; // In a real app, this would be the user's location
+        
+        // Save the order to recent orders
+        addWhatsAppOrder(customerName, productNames, customerLocation);
+        
+        // Generate WhatsApp message
+        const message = encodeURIComponent(
+          `Hello, I would like to order:\n\n` +
+          `${quantity}x ${product.name}\n` +
+          `Price: $${(product.price * quantity).toFixed(2)}\n\n` +
+          `Please provide details for payment and delivery.`
+        );
+        
+        // Open WhatsApp
+        window.open(`https://wa.me/+6281234567890?text=${message}`, '_blank');
+        
+        toast({
+          title: "WhatsApp Order",
+          description: "Opening WhatsApp to complete your order",
+        });
+      });
+    } catch (error) {
+      console.error("Error processing WhatsApp order:", error);
+      toast({
+        title: "Error",
+        description: "Failed to process WhatsApp order",
+        variant: "destructive",
+      });
+    }
   };
 
   if (loading) {
@@ -121,11 +151,14 @@ const ProductPage: React.FC = () => {
         <div className="perspective-container">
           <div className="rotate-y-hover">
             <div className="aspect-square overflow-hidden rounded-2xl bg-ahsan-krem">
-              {product.images.length > 0 ? (
+              {product.images && product.images.length > 0 ? (
                 <img
                   src={product.images[activeImage]}
                   alt={product.name}
                   className="w-full h-full object-cover object-center transition-all duration-700"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "https://via.placeholder.com/600?text=No+Image";
+                  }}
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-ahsan-krem">
@@ -135,7 +168,7 @@ const ProductPage: React.FC = () => {
             </div>
           </div>
 
-          {product.images.length > 1 && (
+          {product.images && product.images.length > 1 && (
             <div className="flex mt-4 space-x-2">
               {product.images.map((img, idx) => (
                 <button
@@ -151,6 +184,9 @@ const ProductPage: React.FC = () => {
                     src={img}
                     alt={`${product.name} - view ${idx + 1}`}
                     className="w-full h-full object-cover object-center"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "https://via.placeholder.com/150?text=No+Image";
+                    }}
                   />
                 </button>
               ))}

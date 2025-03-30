@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Product } from "../types/Product";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "../contexts/CartContext";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 interface ProductCardProps {
   product: Product;
@@ -17,18 +17,34 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     e.preventDefault();
     e.stopPropagation();
     
-    addToCart(product, 1);
+    try {
+      addToCart(product, 1);
+      toast({
+        title: "Added to Cart",
+        description: `${product.name} has been added to your cart`,
+      });
+    } catch (error) {
+      console.error("Error adding product to cart:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add product to cart",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
     <div className="card-product group h-full flex flex-col overflow-hidden animate-scale-up transition-all duration-300 hover:-translate-y-1">
       <Link to={`/products/${product.id}`} className="flex-1 flex flex-col">
         <div className="aspect-square relative overflow-hidden bg-ahsan-krem">
-          {product.images.length > 0 ? (
+          {product.images && product.images.length > 0 ? (
             <img
               src={product.images[0]}
               alt={product.name}
               className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = "https://via.placeholder.com/400?text=No+Image";
+              }}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-ahsan-krem">

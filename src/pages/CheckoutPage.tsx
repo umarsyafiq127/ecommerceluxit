@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useCart } from "../contexts/CartContext";
@@ -242,6 +243,12 @@ ${cartDetails}
                         <div className="flex items-center">
                           <DollarSign className="mr-2 h-4 w-4" />
                           <span>Cash on Delivery (COD)</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="WhatsApp">
+                        <div className="flex items-center">
+                          <ShoppingCart className="mr-2 h-4 w-4" />
+                          <span>WhatsApp Order</span>
                         </div>
                       </SelectItem>
                     </SelectContent>

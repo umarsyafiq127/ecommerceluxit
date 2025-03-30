@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { getProducts, getProductCategories } from "../services/ProductService";
 import { Product, ProductFilterOptions } from "../types/Product";
@@ -30,16 +29,13 @@ const ProductsPage: React.FC = () => {
       try {
         setLoading(true);
         
-        // Fetch categories
         const fetchedCategories = await getProductCategories();
         setCategories(fetchedCategories);
         
-        // Fetch all products
         const fetchedProducts = await getProducts();
         setProducts(fetchedProducts);
         setFilteredProducts(fetchedProducts);
         
-        // Get max price for range slider
         if (fetchedProducts.length > 0) {
           const maxPrice = Math.max(...fetchedProducts.map(p => p.price));
           const roundedMaxPrice = Math.ceil(maxPrice / 100) * 100;
@@ -60,13 +56,11 @@ const ProductsPage: React.FC = () => {
   useEffect(() => {
     const applyFilters = async () => {
       try {
-        // Parse sort option
         const [sortBy, sortOrder] = sortOption.split("-") as [
           "price" | "createdAt" | "name",
           "asc" | "desc"
         ];
         
-        // Build filter options
         const filterOptions: ProductFilterOptions = {
           search: searchTerm,
           minPrice: priceRange[0],
@@ -83,7 +77,6 @@ const ProductsPage: React.FC = () => {
           filterOptions.featured = true;
         }
         
-        // Fetch filtered products
         const filtered = await getProducts(filterOptions);
         setFilteredProducts(filtered);
       } catch (err) {
@@ -177,7 +170,6 @@ const ProductsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Panel Filter */}
         <div
           className={`mt-4 p-6 bg-white rounded-lg shadow-md animate-fade-in transition-all duration-300 ${
             showFilters ? "block" : "hidden"
@@ -236,7 +228,6 @@ const ProductsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Filter Aktif */}
         {(searchTerm || selectedCategory || onlyFeatured || priceRange[0] > 0 || priceRange[1] < maxPriceInStore) && (
           <div className="mt-4 flex flex-wrap gap-2 items-center">
             <span className="text-sm font-medium text-gray-500">Filter Aktif:</span>
@@ -292,7 +283,6 @@ const ProductsPage: React.FC = () => {
         )}
       </div>
 
-      {/* Grid Produk */}
       {filteredProducts.length === 0 ? (
         <div className="py-16 text-center">
           <h3 className="heading-tertiary mb-4">Tidak ada produk ditemukan</h3>
